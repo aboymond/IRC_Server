@@ -60,6 +60,4 @@ public:
 	};
 };
 
-//test
-
 #endif
