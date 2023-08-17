@@ -47,26 +47,26 @@ void Server::setAndAssignSocketToClient(){
 
 		int activity = select(max_fd + 1, &readfds, NULL, NULL, NULL);
 		if (activity < 0) {
-			std::cerr << "Error with select: " << strerror(errno) << std::endl;
+			std::cerr << "Error with select: " << hstrerror(errno) << std::endl;
 			continue;
 		}
 
 		if (FD_ISSET(_socketServer, &readfds)) {
 			int clientSocket = accept(_socketServer, NULL, NULL);
 			if (clientSocket < 0) {
-				std::cerr << "Error accepting client connection: " << strerror(errno) << std::endl;
+				std::cerr << "Error accepting client connection: " << hstrerror(errno) << std::endl;
 			} else {
 				std::cout << "New connection accepted. Client socket: " << clientSocket << std::endl;
 				_clientSockets.push_back(clientSocket);
 
 				int flags = fcntl(clientSocket, F_GETFL, 0);
 				if (flags == -1) {
-					std::cerr << "Error getting socket flags: " << strerror(errno) << std::endl;
+					std::cerr << "Error getting socket flags: " << hstrerror(errno) << std::endl;
 					close(clientSocket);
 					continue;
 				}
 				if (fcntl(clientSocket, F_SETFL, flags | O_NONBLOCK) == -1) {
-					std::cerr << "Error setting socket to non-blocking: " << strerror(errno) << std::endl;
+					std::cerr << "Error setting socket to non-blocking: " << hstrerror(errno) << std::endl;
 					close(clientSocket);
 					continue;
 				}
@@ -80,7 +80,7 @@ void Server::setAndAssignSocketToClient(){
 				ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
 				if (bytesRead < 0) {
 					if (errno != EAGAIN && errno != EWOULDBLOCK) {
-						std::cerr << "Error receiving data: " << strerror(errno) << std::endl;
+						std::cerr << "Error receiving data: " << hstrerror(errno) << std::endl;
 					}
 				} else if (bytesRead == 0) {
 					std::cout << "Client disconnected." << std::endl;
@@ -92,7 +92,7 @@ void Server::setAndAssignSocketToClient(){
 					std::cout << "Client " << clientSocket << " | Received: " << buffer << std::endl;
 					ssize_t bytesSent = send(clientSocket, "> ", 2, 0);
 					if (bytesSent < 0) {
-						std::cerr << "Error sending data: " << strerror(errno) << std::endl;
+						std::cerr << "Error sending data: " << hstrerror(errno) << std::endl;
 					}
 				}
 			}
@@ -100,7 +100,6 @@ void Server::setAndAssignSocketToClient(){
 	}
 
 	close(_socketServer);
-	coucou
 }
 
 

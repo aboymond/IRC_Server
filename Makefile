@@ -1,6 +1,6 @@
 NAME = ircserv
 SRCS = main.cpp server.cpp
-CXX = c++
+CXX = g++
 CXXFLAGS = -Wall -Werror -Wextra -g -std=c++98 #-fsanitize=address
 OBJ = ${SRCS:.cpp=.o}
 # fin de la declatation des variables

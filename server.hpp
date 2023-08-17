@@ -1,6 +1,11 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+// Linux
+#include <cstdlib>
+#include <cerrno>
+
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
