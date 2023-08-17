@@ -60,10 +60,4 @@ public:
 	};
 };
 
-// Test 2 to main
-// Test 3 git
-// add comment
-// add 2
-// pouet
-
 #endif
