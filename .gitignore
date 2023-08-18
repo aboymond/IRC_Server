@@ -1,4 +1,5 @@
 */*.o
+*.o
 *.pdf
-./ircserv
-./.idea
+ircserv
+.idea
