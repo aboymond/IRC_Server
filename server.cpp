@@ -80,7 +80,7 @@ void Server::setAndAssignSocketToClient(){
 				ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
 				if (bytesRead < 0) {
 					if (errno != EAGAIN && errno != EWOULDBLOCK) {
-						std::cerr << "Error receiving data: " << hstrerror(errno) << std::endl;
+						std::cerr << "Error receiving data: " << std::endl;
 					}
 				} else if (bytesRead == 0) {
 					std::cout << "Client disconnected." << std::endl;
@@ -92,7 +92,7 @@ void Server::setAndAssignSocketToClient(){
 					std::cout << "Client " << clientSocket << " | Received: " << buffer << std::endl;
 					ssize_t bytesSent = send(clientSocket, "> ", 2, 0);
 					if (bytesSent < 0) {
-						std::cerr << "Error sending data: " << hstrerror(errno) << std::endl;
+						std::cerr << "Error sending data: "  << std::endl;
 					}
 				}
 			}
