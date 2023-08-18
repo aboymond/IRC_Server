@@ -90,9 +90,20 @@ void Server::setAndAssignSocketToClient(){
 				} else {
 					buffer[bytesRead] = '\0';
 					std::cout << "Client " << clientSocket << " | Received: " << buffer << std::endl;
-					ssize_t bytesSent = send(clientSocket, "> ", 2, 0);
-					if (bytesSent < 0) {
-						std::cerr << "Error sending data: " << hstrerror(errno) << std::endl;
+
+                    // Zone de test
+
+                    if (strncmp(buffer, "create_channel", 14) == 0) {
+                        std::string channelName = buffer + 14;
+                        // Envoi de la commande de création de canal au client
+                        std::cout << "Server " << clientSocket << " | Send: " << buffer << std::endl;
+                        std::string createChannelCommand = "/create " + channelName;
+                        ssize_t bytesSent = send(clientSocket, createChannelCommand.c_str(), createChannelCommand.size(), 0);
+                        if (bytesSent < 0) {
+                            std::cerr << "Erreur d'envoi de données: " << strerror(errno) << std::endl;
+                        }
+                    // Fin zone de test
+
 					}
 				}
 			}
