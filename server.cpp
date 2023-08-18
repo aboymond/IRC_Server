@@ -47,26 +47,26 @@ void Server::setAndAssignSocketToClient(){
 
 		int activity = select(max_fd + 1, &readfds, NULL, NULL, NULL);
 		if (activity < 0) {
-			std::cerr << "Error with select: " << hstrerror(errno) << std::endl;
+			std::cerr << "Error with select: " << std::endl;
 			continue;
 		}
 
 		if (FD_ISSET(_socketServer, &readfds)) {
 			int clientSocket = accept(_socketServer, NULL, NULL);
 			if (clientSocket < 0) {
-				std::cerr << "Error accepting client connection: " << hstrerror(errno) << std::endl;
+				std::cerr << "Error accepting client connection: " << std::endl;
 			} else {
 				std::cout << "New connection accepted. Client socket: " << clientSocket << std::endl;
 				_clientSockets.push_back(clientSocket);
 
 				int flags = fcntl(clientSocket, F_GETFL, 0);
 				if (flags == -1) {
-					std::cerr << "Error getting socket flags: " << hstrerror(errno) << std::endl;
+					std::cerr << "Error getting socket flags: " << std::endl;
 					close(clientSocket);
 					continue;
 				}
 				if (fcntl(clientSocket, F_SETFL, flags | O_NONBLOCK) == -1) {
-					std::cerr << "Error setting socket to non-blocking: " << hstrerror(errno) << std::endl;
+					std::cerr << "Error setting socket to non-blocking: " << std::endl;
 					close(clientSocket);
 					continue;
 				}
@@ -90,9 +90,20 @@ void Server::setAndAssignSocketToClient(){
 				} else {
 					buffer[bytesRead] = '\0';
 					std::cout << "Client " << clientSocket << " | Received: " << buffer << std::endl;
-					ssize_t bytesSent = send(clientSocket, "> ", 2, 0);
-					if (bytesSent < 0) {
-						std::cerr << "Error sending data: "  << std::endl;
+
+                    // Zone de test
+
+                    if (strncmp(buffer, "create_channel", 14) == 0) {
+                        std::string channelName = buffer + 14;
+                        // Envoi de la commande de création de canal au client
+                        std::cout << "Server " << clientSocket << " | Send: " << buffer << std::endl;
+                        std::string createChannelCommand = "/create " + channelName;
+                        ssize_t bytesSent = send(clientSocket, createChannelCommand.c_str(), createChannelCommand.size(), 0);
+                        if (bytesSent < 0) {
+                            std::cerr << "Erreur d'envoi de données: " << std::endl;
+                        }
+                    // Fin zone de test
+
 					}
 				}
 			}
