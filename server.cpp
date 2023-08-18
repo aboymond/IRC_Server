@@ -90,6 +90,7 @@ void Server::setAndAssignSocketToClient(){
 				} else {
 					buffer[bytesRead] = '\0';
 					std::cout << "Client " << clientSocket << " | Received: " << buffer << std::endl;
+<<<<<<< HEAD
 
                     // Zone de test
 
@@ -104,6 +105,11 @@ void Server::setAndAssignSocketToClient(){
                         }
                     // Fin zone de test
 
+=======
+					ssize_t bytesSent = send(clientSocket, "> ", 2, 0);
+					if (bytesSent < 0) {
+						std::cerr << "Error sending data: "  << std::endl;
+>>>>>>> master
 					}
 				}
 			}
