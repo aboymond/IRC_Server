@@ -43,20 +43,20 @@ void Client::parseNick_User(const string& data){
 //		printf("\tline = %s\n", line.c_str());
         if (line.find("NICK ") == 0){
 			//write(1, "test", 4);
-            string nick = line.substr(5);
+            string nick = line.substr(5, 6);
 			//nick.erase(remove(nick.begin(), nick.end(), '\n'), nick.end());
 			//printf("\tnick = %s\n", nick.c_str());
 			//_nickName = nick;
-			for (int i = 0; nick[i]; i++){
-				printf("char = %c, int = %i", nick[i] , nick[i]);
-			}
-			//client.setNickname(nick);
+//			for (int i = 0; nick[i]; i++){
+//				printf("char = %c, int = %i", nick[i] , nick[i]);
+//			}
+			client.setNickname(nick);
         }
         if (line.find("USER ") == 0){
-            string user = line.substr(5);
+            string user = line.substr(5, 8);
             //_userName = user;
-			client.setNickname(user);
+			client.setUsername(user);
         }
     }
-    //cout << "Parse nick = " << client.getNickname() << " | user = " << client.getUsername() << endl;
+    cout << "Parse nick = " << client.getNickname() << " | user = " << client.getUsername() << endl;
 }
