@@ -1,5 +1,5 @@
 NAME = ircserv
-SRCS = main.cpp server.cpp
+SRCS = main.cpp server.cpp client.cpp
 CXX = g++
 CXXFLAGS = -Wall -Werror -Wextra -g -std=c++98 #-fsanitize=address
 OBJ = ${SRCS:.cpp=.o}

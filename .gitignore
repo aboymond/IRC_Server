@@ -2,3 +2,4 @@
 *.pdf
 ./ircserv
 ./.idea
+.idea/

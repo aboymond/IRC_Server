@@ -1,6 +1,8 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include "client.hpp"
+
 // Linux
 #include <cstdlib>
 #include <cerrno>
@@ -28,11 +30,12 @@ private:
 	int					_port;
 	string 				_password;
 	vector<int>			_idUser;
-	int 				_socketServer;
-	struct sockaddr_in  _addressServer;
-	vector<int> 		_clientSockets;
-	//struct sockaddr_in	_addressClient;
+    int 				_socketServer;
+    struct sockaddr_in  _addressServer;
 
+    vector<Client>      _clients;
+
+	vector<int> 		_clientSockets;
 public:
 
 	Server();
@@ -52,6 +55,7 @@ public:
 	void 	connectServer( void );
 
 	//void	startListening();
+
 
 	class BadArgument : public exception
 	{

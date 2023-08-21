@@ -70,35 +70,40 @@ void Server::setAndAssignSocketToClient(){
 					close(clientSocket);
 					continue;
 				}
+                Client newClient(clientSocket);
+                _clients.push_back(newClient);
 			}
 		}
 
-		for (std::vector<int>::iterator it = _clientSockets.begin(); it != _clientSockets.end(); it++) {
-			int clientSocket = *it;
-			if (FD_ISSET(clientSocket, &readfds)) {
+		for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+			Client &client = *it;
+			if (FD_ISSET(client.getSocket(), &readfds)) {
 				char buffer[1024];
-				ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+				ssize_t bytesRead = recv(client.getSocket(), buffer, sizeof(buffer), 0);
 				if (bytesRead < 0) {
 					if (errno != EAGAIN && errno != EWOULDBLOCK) {
 						std::cerr << "Error receiving data: " << hstrerror(errno) << std::endl;
 					}
 				} else if (bytesRead == 0) {
-					std::cout << "Client disconnected." << std::endl;
-					it = _clientSockets.erase(it);
+					std::cout << "Client: " << client.getSocket() <<" | disconnected." << std::endl;
+					it = _clients.erase(it);
 					--it;
-					close(clientSocket);
+					close(client.getSocket());
 				} else {
 					buffer[bytesRead] = '\0';
-					std::cout << "Client " << clientSocket << " | Received: " << buffer << std::endl;
+					std::cout << "Client " << client.getSocket() << " | Received: " << buffer << std::endl;
 
                     // Zone de test
+                    // Pour se renvoyer une demamnde au client:  :NICK!~USER@leServeur ARGUMENTS ex: JOIN :#test
+                    client.parseNick_User(buffer);
 
-                    if (strncmp(buffer, "create_channel", 14) == 0) {
-                        std::string channelName = buffer + 14;
+                    //cout << "NICK = " << client.getNickname() << " | USER = " << client.getUsername() << endl;
+                    if (strncmp(buffer, "JOIN #", 6) == 0) {
+                        //std::string channelName = buffer + 6;
                         // Envoi de la commande de création de canal au client
-                        std::cout << "Server " << clientSocket << " | Send: " << buffer << std::endl;
-                        std::string createChannelCommand = "/create " + channelName;
-                        ssize_t bytesSent = send(clientSocket, createChannelCommand.c_str(), createChannelCommand.size(), 0);
+                        std::cout << "Server " << client.getSocket() << " | Send: " << buffer << std::endl;
+                        std::string createChannelCommand = ":piow1!~piow1@localhost JOIN :#test \r\n";
+                        ssize_t bytesSent = send(client.getSocket(), createChannelCommand.c_str(), createChannelCommand.size(), 0);
                         if (bytesSent < 0) {
                             std::cerr << "Erreur d'envoi de données: " << strerror(errno) << std::endl;
                         }
