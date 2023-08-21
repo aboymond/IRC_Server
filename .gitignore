@@ -1,7 +1,9 @@
 */*.o
 *.o
 *.pdf
+./ircserv
+.idea/
 ircserv
-.idea
 .idea/*
-*/*.idea/
+
+
