@@ -95,11 +95,12 @@ void Server::setAndAssignSocketToClient(){
 
                     // Zone de test
                     // Pour se renvoyer une demamnde au client:  :NICK!~USER@leServeur ARGUMENTS ex: JOIN :#test
-                    client.parseNick_User(buffer);
-
+                    //client.parseNick_User(buffer);
+					for (int i = 0; buffer[i]; i++){
+						printf("char = %c, int = %i", buffer[i] , buffer[i]);
+					}
                     //cout << "NICK = " << client.getNickname() << " | USER = " << client.getUsername() << endl;
                     if (strncmp(buffer, "JOIN #", 6) == 0) {
-                        //std::string channelName = buffer + 6;
                         // Envoi de la commande de création de canal au client
                         std::cout << "Server " << client.getSocket() << " | Send: " << buffer << std::endl;
                         std::string createChannelCommand = ":piow1!~piow1@localhost JOIN :#test \r\n";

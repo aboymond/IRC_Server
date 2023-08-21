@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <unistd.h>
 #include <sstream>
 
 using namespace std;
@@ -18,6 +19,7 @@ private:
 
 public:
     Client(int socket);
+	Client();
     ~Client();
 
     //Get infos client
