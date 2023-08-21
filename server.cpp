@@ -93,31 +93,31 @@ void Server::setAndAssignSocketToClient(){
 					buffer[bytesRead] = '\0';
 					std::cout << "Client " << client.getSocket() << " | Received: " << buffer << std::endl;
 
-//					for (int i = 0; buffer[i]; i++){
-//						 cout << "buf = " << buffer[i] << endl;
-//					}
+
                     // Zone de test
                     // Pour se renvoyer une demamnde au client:  :NICK!~USER@leServeur ARGUMENTS ex: JOIN :#test
+
                     client.parseNick_User(buffer);
-					//cout << "buffer = " << buffer << endl;
-                    //cout << "NICK = " << client.getNickname() << " | USER = " << client.getUsername() << endl;
-//                    if (strncmp(buffer, "JOIN #", 6) == 0) {
-//                        // Envoi de la commande de création de canal au client
-//                        std::cout << "Server " << client.getSocket() << " | Send: " << buffer << std::endl;
-//                        std::string createChannelCommand = ":piow1!~piow1@localhost JOIN :#test \r\n";
-//                        ssize_t bytesSent = send(client.getSocket(), createChannelCommand.c_str(), createChannelCommand.size(), 0);
-//                        if (bytesSent < 0) {
-//                            std::cerr << "Erreur d'envoi de données: " << std::endl;
-//                        }
+
+                    cout << "set and assign NICK = " << client.getNickname() << " | set and assign USER = " << client.getUsername() << endl;
+
+                    if (strncmp(buffer, "JOIN #", 6) == 0) {
+                        // Envoi de la commande de création de canal au client
+                        std::cout << "Server " << client.getSocket() << " | Send: " << buffer << std::endl;
+                        std::string createChannelCommand = ":" + client.getNickname() + "!~" + client.getUsername() + "@localhost JOIN :#test \r\n";
+                        ssize_t bytesSent = send(client.getSocket(), createChannelCommand.c_str(), createChannelCommand.size(), 0);
+                        if (bytesSent < 0) {
+                            std::cerr << "Erreur d'envoi de données: " << std::endl;
+                        }
                     // Fin zone de test
 
-//					}
+					}
 				}
 			}
 		}
-	}
+        close(_socketServer);
+    }
 
-	//close(_socketServer);
 }
 
 
@@ -130,7 +130,7 @@ void Server::setSocketServer() {
 }
 
 void Server::setAddressServer() {
-	_addressServer.sin_addr.s_addr = inet_addr( "127.0.0.1" );
+	_addressServer.sin_addr.s_addr = inet_addr( "localhost" );
 	_addressServer.sin_family = AF_INET;
 	_addressServer.sin_port = htons(_port);
 }

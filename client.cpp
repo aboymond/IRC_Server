@@ -1,5 +1,8 @@
 #include "client.hpp"
 
+#include <stdio.h>
+#include <unistd.h>
+
 Client::Client(){}
 
 Client::Client(int socket) : _socket(socket), _isOperator(false) {}
@@ -37,26 +40,24 @@ void Client::setOperator(bool isOperator) {
 void Client::parseNick_User(const string& data){
     istringstream iss(data);
     string line;
-	Client client;
 
     while (getline(iss, line, '\n')){
-//		printf("\tline = %s\n", line.c_str());
+        size_t compt = 0;
         if (line.find("NICK ") == 0){
-			//write(1, "test", 4);
-            string nick = line.substr(5, 6);
-			//nick.erase(remove(nick.begin(), nick.end(), '\n'), nick.end());
-			//printf("\tnick = %s\n", nick.c_str());
-			//_nickName = nick;
-//			for (int i = 0; nick[i]; i++){
-//				printf("char = %c, int = %i", nick[i] , nick[i]);
-//			}
-			client.setNickname(nick);
+            compt = 5;
+            while (compt < line.length() && line[compt] != '\r'){
+                compt++;
+            }
+            string nick = line.substr(5, compt - 5);
+            setNickname(nick);
         }
+
         if (line.find("USER ") == 0){
-            string user = line.substr(5, 8);
-            //_userName = user;
-			client.setUsername(user);
+            compt = 5;
+            while (compt < line.length() && line[compt] != ' ')
+                compt++;
+            string user = line.substr(5, compt - 5);
+            setUsername(user);
         }
     }
-    cout << "Parse nick = " << client.getNickname() << " | user = " << client.getUsername() << endl;
 }
