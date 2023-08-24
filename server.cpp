@@ -30,8 +30,8 @@ int Server::getSocketServer() {
 }
 
 void Server::setAndAssignSocketToClient(){
-	fd_set readfds;
 	int max_fd = _socketServer;
+	fd_set readfds;
 
 	while (true) {
 		FD_ZERO(&readfds);
@@ -44,10 +44,10 @@ void Server::setAndAssignSocketToClient(){
 				max_fd = clientSocket;
 			}
 		}
-
+		sleep(1);
 		int activity = select(max_fd + 1, &readfds, NULL, NULL, NULL);
 		if (activity < 0) {
-			std::cerr << "Error with select: " << std::endl;
+			std::cerr << "Error with select: "<< activity << std::endl;
 			continue;
 		}
 
@@ -76,7 +76,7 @@ void Server::setAndAssignSocketToClient(){
 		}
 
 		for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
-			Client &client = *it;
+			Client client = *it;
 			if (FD_ISSET(client.getSocket(), &readfds)) {
 				char buffer[1024];
 				ssize_t bytesRead = recv(client.getSocket(), buffer, sizeof(buffer), 0);
@@ -93,17 +93,18 @@ void Server::setAndAssignSocketToClient(){
 					buffer[bytesRead] = '\0';
 					std::cout << "Client " << client.getSocket() << " | Received: " << buffer << std::endl;
 
+
                     // Zone de test
                     // Pour se renvoyer une demamnde au client:  :NICK!~USER@leServeur ARGUMENTS ex: JOIN :#test
-                    //client.parseNick_User(buffer);
-					for (int i = 0; buffer[i]; i++){
-						printf("char = %c, int = %i", buffer[i] , buffer[i]);
-					}
-                    //cout << "NICK = " << client.getNickname() << " | USER = " << client.getUsername() << endl;
+
+                    client.parseNick_User(buffer);
+
+                    cout << "set and assign NICK = " << client.getNickname() << " | set and assign USER = " << client.getUsername() << endl;
+
                     if (strncmp(buffer, "JOIN #", 6) == 0) {
                         // Envoi de la commande de création de canal au client
-                        std::cout << "Server " << client.getSocket() << " | Send: " << buffer << std::endl;
-                        std::string createChannelCommand = ":piow1!~piow1@localhost JOIN :#test \r\n";
+                        //std::cout << "Server " << client.getSocket() << " | Send: " << buffer << std::endl;
+                        std::string createChannelCommand = "test \r\n";
                         ssize_t bytesSent = send(client.getSocket(), createChannelCommand.c_str(), createChannelCommand.size(), 0);
                         if (bytesSent < 0) {
                             std::cerr << "Erreur d'envoi de données: " << std::endl;
@@ -114,9 +115,9 @@ void Server::setAndAssignSocketToClient(){
 				}
 			}
 		}
-	}
-
+    }
 	close(_socketServer);
+
 }
 
 

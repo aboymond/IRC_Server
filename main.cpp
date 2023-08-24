@@ -1,5 +1,6 @@
 #include "server.hpp"
 
+
 int main(int argc, char** argv) {
 	if (argc != 3) {
 		std::cerr << "Usage: " << argv[0] << " <port> <test>" << std::endl;
@@ -14,7 +15,7 @@ int main(int argc, char** argv) {
 		server.setSocketServer();
 		server.setAddressServer();
 		server.connectServer();
-		listen( server.getSocketServer(), 5 );
+		listen( server.getSocketServer(), 100);
 		server.setAndAssignSocketToClient();
 	} catch (const char* errorMessage) {
 		std::cerr << "Error: " << errorMessage << std::endl;
