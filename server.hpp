@@ -25,6 +25,7 @@
 using namespace std;
 
 #define IP_SERV "127.0.0.1"
+
 //#define IP_SERV "10.11.12.1" // IP 42 Alex
 //#define IP_SERV "10.11.12.3" // IP 42 Quent
 
@@ -56,7 +57,8 @@ public:
 	void 	setSocketServer( void );
 	void 	setAddressServer( void );
 	void 	setAndAssignSocketToClient( void );
-
+	fd_set 	checkClientConnection( void );
+	void	collectDataFromClient( fd_set readfds );
 	void 	connectServer( void );
 
 	//void	startListening();
