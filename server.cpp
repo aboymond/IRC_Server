@@ -60,15 +60,15 @@ void 	Server::collectDataFromClient( fd_set readfds ) {
 				// Zone de test
 				// Pour se renvoyer une demamnde au client:  :NICK!~USER@leServeur ARGUMENTS ex: JOIN :#test
         
-        if (client.getNickUserInit() == false){
-                    client.parseNick_User(buffer);
-          for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-            if (it->getSocket() == client.getSocket()) {
-              *it = client;
-              break;
-            }
-          }
-        }
+				if (client.getNickUserInit() == false){
+							client.parseNick_User(buffer);
+				  for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+					if (it->getSocket() == client.getSocket()) {
+					  *it = client;
+					  break;
+					}
+				  }
+				}
         // Fin zone de test
 
 			}
@@ -77,7 +77,6 @@ void 	Server::collectDataFromClient( fd_set readfds ) {
 }
 
 fd_set Server::checkClientConnection() {
-	cout << "test2" << endl;
 	int max_fd = _socketServer;
 	fd_set readfds;
 	FD_ZERO(&readfds);
@@ -89,7 +88,6 @@ fd_set Server::checkClientConnection() {
 			max_fd = clientSocket;
 		}
 	}
-	cout << "test3" << endl;
 	sleep(1);
 	int activity = select(max_fd + 1, &readfds, NULL, NULL, NULL);
 	if (activity < 0) {
@@ -99,9 +97,7 @@ fd_set Server::checkClientConnection() {
 	}
 
 	if (FD_ISSET(_socketServer, &readfds)) {
-		cout << "test 6" << endl;
 		int clientSocket = accept(_socketServer, NULL, NULL);
-		cout << "test4" << endl;
 		if (clientSocket < 0) {
 			std::cerr << "Error accepting client connection: " << std::endl;
 		} else {
