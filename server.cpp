@@ -47,7 +47,7 @@ void Server::setAndAssignSocketToClient(){
 		sleep(1);
 		int activity = select(max_fd + 1, &readfds, NULL, NULL, NULL);
 		if (activity < 0) {
-			std::cerr << "Error with select: " << std::endl;
+			std::cerr << "Error with select: "<< activity << std::endl;
 			continue;
 		}
 
@@ -99,7 +99,7 @@ void Server::setAndAssignSocketToClient(){
 
                     client.parseNick_User(buffer);
 
-                    //cout << "set and assign NICK = " << client.getNickname() << " | set and assign USER = " << client.getUsername() << endl;
+                    cout << "set and assign NICK = " << client.getNickname() << " | set and assign USER = " << client.getUsername() << endl;
 
                     if (strncmp(buffer, "JOIN #", 6) == 0) {
                         // Envoi de la commande de création de canal au client
