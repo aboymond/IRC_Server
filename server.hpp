@@ -24,6 +24,8 @@
 
 using namespace std;
 
+#define IP_SERV "127.0.0.1"
+
 class Server {
 
 private:
@@ -51,7 +53,8 @@ public:
 	void 	setSocketServer( void );
 	void 	setAddressServer( void );
 	void 	setAndAssignSocketToClient( void );
-
+	fd_set 	checkClientConnection( void );
+	void	collectDataFromClient( fd_set readfds );
 	void 	connectServer( void );
 
 	//void	startListening();

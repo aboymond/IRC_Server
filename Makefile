@@ -3,7 +3,7 @@ SRCS = main.cpp server.cpp client.cpp
 CXX = g++
 CXXFLAGS = -Wall -Werror -Wextra -g -std=c++98 -fsanitize=address
 OBJ = ${SRCS:.cpp=.o}
-ARGS =	8085 test
+ARGS =	6667 test
 # fin de la declatation des variables
 
 all : ${NAME}
