@@ -76,7 +76,7 @@ void Server::setAndAssignSocketToClient(){
 		}
 
 		for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
-			Client client = *it;
+			Client &client = *it;
 			if (FD_ISSET(client.getSocket(), &readfds)) {
 				char buffer[1024];
 				ssize_t bytesRead = recv(client.getSocket(), buffer, sizeof(buffer), 0);
@@ -97,7 +97,15 @@ void Server::setAndAssignSocketToClient(){
                     // Zone de test
                     // Pour se renvoyer une demamnde au client:  :NICK!~USER@leServeur ARGUMENTS ex: JOIN :#test
 
-                    client.parseNick_User(buffer);
+					if (client.getNickUserInit() == false){
+                    	client.parseNick_User(buffer);
+						for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+							if (it->getSocket() == client.getSocket()) {
+								*it = client;
+								break;
+							}
+						}
+					}
 
                     cout << "set and assign NICK = " << client.getNickname() << " | set and assign USER = " << client.getUsername() << endl;
 
@@ -130,7 +138,7 @@ void Server::setSocketServer() {
 }
 
 void Server::setAddressServer() {
-	_addressServer.sin_addr.s_addr = inet_addr( "127.0.0.1" );
+	_addressServer.sin_addr.s_addr = inet_addr( IP_SERV );
 	_addressServer.sin_family = AF_INET;
 	_addressServer.sin_port = htons(_port);
 }
