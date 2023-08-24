@@ -5,7 +5,7 @@
 
 Client::Client(){}
 
-Client::Client(int socket) : _socket(socket), _isOperator(false) {}
+Client::Client(int socket) : _socket(socket), _isOperator(false), _nick_user_init(false) {}
 
 Client::~Client() {}
 
@@ -25,6 +25,14 @@ bool Client::isOperator() const {
     return(_isOperator);
 }
 
+bool Client::getNickUserInit() const {
+	return(_nick_user_init);
+}
+
+void Client::setSocket(const int socket){
+	_socket = socket;
+}
+
 void Client::setNickname(const string &nickname) {
     _nickName = nickname;
 }
@@ -35,6 +43,10 @@ void Client::setUsername(const string &username) {
 
 void Client::setOperator(bool isOperator) {
     _isOperator = isOperator;
+}
+
+void Client::setNickUserInit(const bool nick_user_init) {
+	_nick_user_init = nick_user_init;
 }
 
 void Client::parseNick_User(const string& data){
@@ -60,4 +72,5 @@ void Client::parseNick_User(const string& data){
             setUsername(user);
         }
     }
+	setNickUserInit(true);
 }

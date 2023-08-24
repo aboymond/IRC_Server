@@ -16,6 +16,7 @@ int main(int argc, char** argv) {
 		server.setAddressServer();
 		server.connectServer();
 		listen( server.getSocketServer(), 100);
+		sleep(2);
 		server.setAndAssignSocketToClient();
 	} catch (const char* errorMessage) {
 		std::cerr << "Error: " << errorMessage << std::endl;

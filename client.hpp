@@ -16,6 +16,7 @@ private:
     string      _userName;
     // Pour que seul les clients qui crees un channel puissent avoir les droits
     bool        _isOperator;
+	bool		_nick_user_init;
 
 public:
     Client(int socket);
@@ -27,11 +28,14 @@ public:
     const string &getNickname() const;
     const string &getUsername() const;
     bool    isOperator() const;
+	bool 	getNickUserInit() const;
 
     //Set infos client
+	void setSocket(const int socket);
     void setNickname(const string &nickname);
     void setUsername(const string &username);
     void setOperator(const bool isOperator);
+	void setNickUserInit(const bool nick_user_init);
 
     //void    initUser();
     void    parseNick_User(const string& data);

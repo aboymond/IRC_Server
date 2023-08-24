@@ -59,10 +59,18 @@ void 	Server::collectDataFromClient( fd_set readfds ) {
 				std::cout << "Client " << client.getSocket() << " | Received: " << buffer << std::endl;
 				// Zone de test
 				// Pour se renvoyer une demamnde au client:  :NICK!~USER@leServeur ARGUMENTS ex: JOIN :#test
+        
+        if (client.getNickUserInit() == false){
+                    client.parseNick_User(buffer);
+          for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+            if (it->getSocket() == client.getSocket()) {
+              *it = client;
+              break;
+            }
+          }
+        }
+        // Fin zone de test
 
-				client.parseNick_User(buffer);
-
-				cout << "set and assign NICK = " << client.getNickname() << " | set and assign USER = " << client.getUsername() << endl;
 			}
 		}
 	}
