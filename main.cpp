@@ -1,27 +1,23 @@
 #include "server.hpp"
 
+int main( int argc, char** argv ) {
 
-int main(int argc, char** argv) {
-	if (argc != 3) {
-		std::cerr << "Usage: " << argv[0] << " <port> <test>" << std::endl;
-		return 1;
+	try
+	{
+		if (argc != 3) {
+			throw Server::BadArgument();
+		}
+		else
+		{
+			int port = atoi(argv[1]);
+			std::string password = argv[2];
+			Server server(port, password);
+
+		}
 	}
-
-	int port = atoi(argv[1]);
-	std::string password = argv[2];
-
-	try {
-		Server server(port, password);
-		server.setSocketServer();
-		server.setAddressServer();
-		server.connectServer();
-		listen( server.getSocketServer(), 100);
-		sleep(2);
-		server.setAndAssignSocketToClient();
-	} catch (const char* errorMessage) {
-		std::cerr << "Error: " << errorMessage << std::endl;
-		return 1;
+	catch ( exception &e )
+	{
+		cout << e.what() << endl;
 	}
-
 	return 0;
 }
