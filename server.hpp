@@ -1,8 +1,6 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "client.hpp"
-
 // Linux
 #include <cstdlib>
 #include <cerrno>
@@ -21,6 +19,7 @@
 #include <exception>
 #include <fcntl.h>
 #include <sys/select.h>
+#include "user.hpp"
 
 using namespace std;
 
@@ -33,15 +32,10 @@ using namespace std;
 class Server {
 
 private:
-	int					_port;
+	int					_socketServer;
+	int 				_port;
 	string 				_password;
-	vector<int>			_idUser;
-    int 				_socketServer;
-    struct sockaddr_in  _addressServer;
 
-    vector<Client>      _clients;
-
-	vector<int> 		_clientSockets;
 public:
 
 	Server();
@@ -53,15 +47,7 @@ public:
 
 	int 	getPort();
 	int 	getSocketServer();
-
-	void 	setSocketServer( void );
-	void 	setAddressServer( void );
-	void 	setAndAssignSocketToClient( void );
-	fd_set 	checkClientConnection( void );
-	void	collectDataFromClient( fd_set readfds );
-	void 	connectServer( void );
-
-	//void	startListening();
+	string	getPassword();
 
 
 	class BadArgument : public exception
