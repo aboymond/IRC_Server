@@ -1,10 +1,14 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "client.hpp"
 #include "user.hpp"
 #include "server.hpp"
 #include <vector>
+
+using namespace std;
+
+class User;
+class Server;
 
 class Client {
 
@@ -19,6 +23,9 @@ public:
 	Client( Client const &src );
 	Client &operator=( Client const &rhs );
 	~Client();
+
+	string getCommand() const;
+	string getOptions() const;
 
 };
 
