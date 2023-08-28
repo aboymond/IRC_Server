@@ -1,7 +1,17 @@
 #include "user.hpp"
 
-User::User() : _moderator(false) {};
+User::User() :
+	//_client(),
+	_nickName(""),
+	_userName(""),
+	_socket_user(0),
+	_moderator(false)
+{
+
+};
+
 User::~User() {};
+
 User::User(User const &src){
 	*this = src;
 }

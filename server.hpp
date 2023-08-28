@@ -35,6 +35,7 @@ private:
 	int					_socketServer;
 	int 				_port;
 	string 				_password;
+	bool 				_validPassword;
 
 public:
 
@@ -45,9 +46,10 @@ public:
 	~Server();
 
 
-	int 	getPort();
-	int 	getSocketServer();
-	string	getPassword();
+	int 	getPort() const;
+	int 	getSocketServer() const;
+	string	getPassword() const;
+	bool	getValidPassword() const;
 
 
 	class BadArgument : public exception
@@ -61,6 +63,8 @@ public:
 	public:
 		virtual const char * what() const throw();
 	};
+
 };
 
+	std::ostream &	operator<<( std::ostream & o, Server const & i );
 #endif

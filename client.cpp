@@ -19,3 +19,11 @@ Client &Client::operator=( const Client &rhs ) {
 }
 
 Client::~Client() {};
+
+string	Client::getCommand() const {
+	return (this->_command);
+}
+
+string	Client::getOptions() const {
+	return (this->_options);
+}

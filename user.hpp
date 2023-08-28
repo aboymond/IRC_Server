@@ -11,8 +11,7 @@
 class User {
 
 private:
-	Client		*_client;
-
+	//Client		*_client;
 	std::string	_nickName;
 	std::string	_userName;
 	int			_socket_user;

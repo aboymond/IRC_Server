@@ -1,5 +1,5 @@
 NAME = ircserv
-SRCS = User.cpp
+SRCS = main.cpp user.cpp client.cpp server.cpp
 CXX = g++
 CXXFLAGS = -Wall -Werror -Wextra -g -std=c++98
 SANITIZE = -fsanitize=address -fno-omit-frame-pointer
