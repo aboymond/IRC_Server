@@ -39,12 +39,14 @@
 //	return 0;
 //}
 
-int main(){
-    Client client;
-    string buffer = "NICK piow00\r\nUSER alex alex localhost ect...\r\n";
-    client.addUser(buffer, 18);
-    string buffer2 = "NICK roger\r\nUSER pouet pouet localhost ect...\r\n";
-    client.addUser(buffer2, 15);
+int main(int argc, char** argv){
+
+	// Test client
+    // Client client;
+    // string buffer = "NICK piow00\r\nUSER alex alex localhost ect...\r\n";
+    // client.addUser(buffer, 18);
+    // string buffer2 = "NICK roger\r\nUSER pouet pouet localhost ect...\r\n";
+    // client.addUser(buffer2, 15);
 
 	try
 	{

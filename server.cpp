@@ -11,6 +11,13 @@ Server::Server() :
 
 Server::Server( int port, string password ) : _port(port), _password(password), _validPassword(false) {
 	_socketServer = socket(AF_INET, SOCK_STREAM, 0);
+	if (_socketServer < 0)
+		cout << "Error socket server" << endl;
+	int optionFlag = 1;
+	if (setsockopt(_socketServer, SOL_SOCKET, SO_REUSEADDR, &optionFlag, sizeof(optionFlag))){
+		cout << "Error setsockopt" << endl;
+	}
+	fcntl(_socketServer, F_SETFL, O_NONBLOCK);
 };
 
 Server::Server( const Server &src ) {
@@ -47,41 +54,78 @@ bool	Server::getValidPassword() const {
 }
 
 void 	Server::createSocketServer() {
-	_serverAddress.sin_addr.s_addr = inet_addr("192.168.1.4");
+	
+	_serverAddress.sin_addr.s_addr = inet_addr(IP_SERV);
 	_serverAddress.sin_family = AF_INET;
-	_serverAddress.sin_port = _port;
+	_serverAddress.sin_port = htons(_port);
 
-	bind(_socketServer, (const struct sockaddr *)&_serverAddress, sizeof(_serverAddress));
+	bind(_socketServer, (struct sockaddr *)&_serverAddress, sizeof(_serverAddress));
 	cout << "bind: " << _socketServer << endl;
-	//listen(_socketServer, 5);
+	listen(_socketServer, 5);
 	cout << "listen" << endl;
+	cout << "Port = " << _port << endl;
+	cout << "IP = " << IP_SERV << endl;
 }
 
 void 	Server::waitToNewConnection() {
-	struct pollfd fds[2];
 
-// Monitor sock1 for input
-	fds[0].fd = _socketServer ;
-	fds[0].events = POLLIN;
+	int max_fd = _socketServer;
+	socklen_t addrlen = sizeof(_serverAddress);
+	fd_set readfds;
 
     while (true)
 	{
-			cout << "test" << endl;
-		int clientSocket = poll( &fds[0], 1, 0 );
-			cout << "test2" << endl;
-		if (clientSocket < 0)
-			cout << "error" << endl;
-		else
-			cout << "coucou" << endl;
-		//socklen_t addrlen = sizeof(_serverAddress);
-		_userSocket = accept(_socketServer, NULL , NULL);
+		FD_ZERO(&readfds);
+		FD_SET(_socketServer, &readfds);
 
-		if (_userSocket != -1)
-		{
-			cout << "valid" << endl;
+		for (size_t i = 0; i < _userSocket.size(); i++){
+			int fd_tmp = _userSocket[i];
+			if (fd_tmp > 0)
+				FD_SET(fd_tmp, &readfds);
+			if (fd_tmp > max_fd)
+				max_fd = fd_tmp;
+			cout << "In 1er for " << endl;
 		}
-		else
-			cout << "error2" << endl;
+
+		cout << "Avant select" << endl;
+		int activity = select( max_fd + 1, &readfds, NULL, NULL, NULL);
+		cout << "Apres select" << endl;
+
+		if (activity < 0 && errno != EINTR)
+			cout << "error" << endl;
+
+		if (FD_ISSET(_socketServer, &readfds)){
+			int tmp_user_socket;
+			if ((tmp_user_socket = accept(_socketServer,(struct sockaddr *)&_serverAddress, &addrlen)) < 0){
+				cout << "Error with accept" << endl;
+			}
+
+			fcntl(tmp_user_socket, F_SETFL, O_NONBLOCK);
+			_userSocket.push_back(tmp_user_socket);
+			cout << "Socket yencli = " << _userSocket.back() << endl;
+			cout << "Apres pushback" << endl;
+		}
+
+		for (size_t i = 0; i < _userSocket.size(); i++){
+			int sd = _userSocket[i];
+			char buffer[1024];
+			if (FD_ISSET(sd, &readfds)){
+				int val_read;
+				if ((val_read = recv(sd, buffer, 1024, 0)) == 0){
+					close(sd);
+					_userSocket.erase(_userSocket.begin() + i);
+				}
+				else{
+					buffer[val_read] = '\0';
+					send(sd, buffer, strlen(buffer), 0);
+					cout << "Client repond: " << buffer << endl;
+				}
+			}
+			cout << "In 2er for " << endl;
+
+		}
+
+		
 	}
 }
 

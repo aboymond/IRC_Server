@@ -39,10 +39,10 @@ private:
 	int 				_port;
 	string 				_password;
 	bool 				_validPassword;
-	int 				_userSocket;
+	vector<int> 		_userSocket;
 	struct sockaddr_in 	_serverAddress;
-	std::vector<pollfd>		_pfds;
-	//Client				*client;
+	//std::vector<pollfd>		_pfds;
+	//Client				*_client;
 	//User				*_user;
 
 public:
