@@ -7,7 +7,7 @@ User::User() :
 	_socket_user(0),
 	_moderator(false)
 {
-
+	cout << "constructor client called" << endl;
 };
 
 User::~User() {};

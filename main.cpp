@@ -45,4 +45,28 @@ int main(){
     client.addUser(buffer, 18);
     string buffer2 = "NICK roger\r\nUSER pouet pouet localhost ect...\r\n";
     client.addUser(buffer2, 15);
+
+	try
+	{
+		if (argc != 3) {
+			throw Server::BadArgument();
+		}
+		else
+		{
+			int port = atoi(argv[1]);
+			std::string password = argv[2];
+			Server server(port, password);
+			server.createSocketServer();
+
+			server.waitToNewConnection();
+			//close(SocketUser);
+			std::cout << server;
+		}
+	}
+	catch ( exception &e )
+	{
+		cout << e.what() << endl;
+	}
+	return 0;
+
 }

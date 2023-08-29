@@ -10,7 +10,7 @@
 
 class User {
 
-private:
+protected:
 	//Client		*_client;
 	std::string	_nickName;
 	std::string	_userName;
