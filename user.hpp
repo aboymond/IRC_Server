@@ -36,6 +36,8 @@ public:
 	int					getSocketUser() const;
 	bool				getOperator() const;
 
+    // Init nick n username
+    void    initUserAndNick(std::string buffer);
 };
 
 #endif

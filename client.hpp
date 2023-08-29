@@ -14,18 +14,22 @@ class Client {
 
 private:
 	Server 			*_server;
-	vector<User>	_user;
+    User            *_userPointer;
 	string			_command;
-	string 			_options;
+    string 			_options;
+    vector<User>	_user;
 
 public:
-	Client();
-	Client( Client const &src );
+    Client();
+    Client( Client const &src );
 	Client &operator=( Client const &rhs );
 	~Client();
 
 	string getCommand() const;
 	string getOptions() const;
+    vector<User>    getUserVector() const;
+
+    void    addUser(string buffer, int socketUser);
 
 };
 

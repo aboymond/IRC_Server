@@ -59,3 +59,29 @@ int			User::getSocketUser() const{
 bool		User::getOperator() const{
 	return (_moderator);
 }
+
+void    User::initUserAndNick(string buffer){
+    std::string nickName;
+    std::string userName;
+    istringstream iss(buffer);
+    string line;
+    size_t i = 5;
+    while (std::getline(iss, line, '\n')) {
+        if (line.find("NICK ") == 0) {
+            while ( i < buffer.length() && buffer[i] != '\r') {
+                nickName.push_back(buffer[i]);
+                i++;
+            }
+            setNickName(nickName);
+        }
+        if (line.find("USER ") == 0) {
+            i += 7;
+            while (i < buffer.length() && buffer[i] != ' ' && buffer[i] != '\r') {
+                userName.push_back(buffer[i]);
+                i++;
+            }
+            setUserName(userName);
+        }
+    }
+//    std::cout << "nick = " << nickName << " | user = " << userName << std::endl;
+}
