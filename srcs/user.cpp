@@ -67,6 +67,8 @@ void    User::initUserAndNick(string buffer){
     string line;
     size_t i = 5;
     while (std::getline(iss, line, '\n')) {
+		if (line.find("CAP LS") == 0)
+			i = 12;
         if (line.find("NICK ") == 0) {
             while ( i < buffer.length() && buffer[i] != '\r') {
                 nickName.push_back(buffer[i]);

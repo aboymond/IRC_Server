@@ -112,14 +112,14 @@ void Server::waitToNewConnection() {
 			if (FD_ISSET(sd, &readfds)) {
 				int val_read;
 				if ((val_read = recv(sd, buffer, 1024, 0)) == 0) {
+					//client.eraseUser(sd);
+					//client.printOutput(3, NULL, 0, sd);
 					close(sd);
 					_userSocket.erase(_userSocket.begin() + i);
-					i--;
 				} else {
 					buffer[val_read] = '\0';
-					if (client.addUser(buffer, _userSocket[i]))
-						client.sendToClient(sd, "ADD YOUR NAME\r\n");
-					client.PrintOutput(1, buffer, i, _userSocket[i]);
+					client.addUser(buffer, _userSocket[i]);
+					client.printOutput(1, buffer, i, _userSocket[i]);
 				}
 			}
 

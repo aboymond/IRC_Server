@@ -39,8 +39,10 @@ public:
 
 	int addUser(string buffer, int socketUser);
 
-	void PrintOutput(int numofoption, string message, int options, int fd);
+	void printOutput(int numofoption, string message, int options, int fd);
 //	void serverPrintOutput(int numofoption, string message, int options, int fd);
+
+	void eraseUser(int socketUser);
 
 	void sendToClient(int fd, std::string message);
 

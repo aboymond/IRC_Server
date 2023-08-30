@@ -15,40 +15,52 @@ void Server::serverPrintOutput(int port, int socketserver) {
 
 }
 
-void Client::PrintOutput(int numofoption, string message, int options, int fd) {
+void Client::printOutput(int numofoption, string message, int options, int fd) {
 	// Send in send.cpp = 1
 	// Receive in server.cpp = 2
-	(void)options;
-	if (numofoption < 1) {
-		cout << "Error print output" << endl;
-		return;
-	} if (numofoption == 1) {
-		for (size_t i = 0; i < _user.size(); i++) {
-			const User &checkUser = _user[i];
-			if (checkUser.getSocketUser() == fd) {
-				cout << "\033[1;31m----- CLIENT TO SERVER ------\033[0m" << endl;
-
-				cout << "FROM CLIENT [ \033[1;31m" << checkUser.getSocketUser() << "\033[0m ] TO SERVER" << endl;
-				cout << "NICKNAME [ \033[1;31m" << checkUser.getNickName() << "\033[0m ]" << endl;
-				cout << "USERNAME [ \033[1;31m" << checkUser.getUserName() << "\033[0m ]" << endl;
-				cout << "<<<<  \033[1;31m" << message << "\033[0m";
-
-				cout << "\033[1;31m----------------------------\033[0m\n" << endl;
-			}
+	(void) options;
+	size_t i = 0;
+	while (i < _user.size()) {
+		const User &checkUser = _user[i];
+		if (numofoption < 1) {
+			cout << "Error print output" << endl;
+			return;
 		}
-	} else if (numofoption == 2) {
-		for (size_t i = 0; i < _user.size(); i++) {
-			const User &checkUser = _user[i];
-			if (checkUser.getSocketUser() == fd) {
-				cout << "\033[1;32m----- SERVER TO CLIENT -----" << endl;
+			if (numofoption == 1) {
+				if (checkUser.getSocketUser() == fd) {
+					cout << "\033[1;93m----- CLIENT TO SERVER ------\033[0m" << endl;
 
-				cout << "FROM SERVER TO CLIENT [ \033[1;32m" << checkUser.getSocketUser() << "\033[0m ]" << endl;
-				cout << "NICKNAME [ \033[1;32m" << checkUser.getNickName() << "\033[0m ]" << endl;
-				cout << "USERNAME [ \033[1;32m" << checkUser.getUserName() << "\033[0m ]" << endl;
-				cout << ">>>> \033[1;32m" << message << "\033[0m";
+					cout << "FROM CLIENT [ \033[1;93m" << checkUser.getSocketUser() << "\033[0m ] TO SERVER" << endl;
+					cout << "NICKNAME [ \033[1;93m" << checkUser.getNickName() << "\033[0m ]" << endl;
+					cout << "USERNAME [ \033[1;93m" << checkUser.getUserName() << "\033[0m ]" << endl;
+					cout << "<<<<  \033[1;93m" << message << "\033[0m";
 
-				cout << "\033[1;32m----------------------------\033[0m\n" << endl;
+					cout << "\033[1;93m----------------------------\033[0m\n" << endl;
+				}
 			}
-		}
+			else if (numofoption == 2) {
+				if (checkUser.getSocketUser() == fd) {
+					cout << "\033[1;96m----- SERVER TO CLIENT -----" << endl;
+
+					cout << "FROM SERVER TO CLIENT [ \033[1;96m" << checkUser.getSocketUser() << "\033[0m ]" << endl;
+					cout << "NICKNAME [ \033[1;96m" << checkUser.getNickName() << "\033[0m ]" << endl;
+					cout << "USERNAME [ \033[1;96m" << checkUser.getUserName() << "\033[0m ]" << endl;
+					cout << ">>>> \033[1;96m" << message << "\033[0m";
+
+					cout << "\033[1;96m----------------------------\033[0m\n" << endl;
+				}
+			}
+			else if (numofoption == 3) {
+				if (checkUser.getSocketUser() == fd) {
+					cout << "\033[1;91----- DECONNECTION -----" << endl;
+
+					cout << "CLIENT [ \033[1;91" << checkUser.getSocketUser() << "\033[0m ]" << endl;
+					cout << "NICKNAME [ \033[1;91" << checkUser.getNickName() << "\033[0m ]" << endl;
+					cout << "USERNAME [ \033[1;91" << checkUser.getUserName() << "\033[0m ]" << endl;
+
+					cout << "\033[1;91----------------------------\033[0m\n" << endl;
+				}
+			}
+		i++;
 	}
 }

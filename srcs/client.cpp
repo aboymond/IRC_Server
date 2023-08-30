@@ -57,5 +57,18 @@ int Client::addUser(string buffer, int socketUser) {
 	newUser.setSocketUser(socketUser);
 	this->_user.push_back(newUser);
 
+
 	return (0);
+}
+
+void Client::eraseUser(int socketUser){
+	for (size_t i = 0; i < _user.size(); i++) {
+		const User &checkUser = _user[i];
+		if (checkUser.getSocketUser() == socketUser) {
+			cout << "socket user in erase = " << socketUser << endl;
+			printOutput(3, NULL, 0, socketUser);
+			_user.erase(_user.begin() + i);
+			i--;
+		}
+	}
 }
