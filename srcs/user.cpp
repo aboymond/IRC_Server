@@ -1,4 +1,4 @@
-#include "user.hpp"
+#include "../headers/user.hpp"
 
 User::User() :
 	//_client(),
@@ -83,5 +83,4 @@ void    User::initUserAndNick(string buffer){
             setUserName(userName);
         }
     }
-//    std::cout << "nick = " << nickName << " | user = " << userName << std::endl;
 }

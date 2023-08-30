@@ -1,5 +1,10 @@
 NAME = ircserv
-SRCS = main.cpp user.cpp client.cpp server.cpp
+SRCS = main.cpp \
+		srcs/user.cpp \
+		srcs/client.cpp \
+		srcs/server.cpp \
+		srcs/send.cpp \
+		srcs/printOutput.cpp
 CXX = g++
 CXXFLAGS = -Wall -Werror -Wextra -g -std=c++98
 SANITIZE = -fsanitize=address -fno-omit-frame-pointer
@@ -17,6 +22,7 @@ l : ${OBJ}
 
 clean :
 	rm -rf *.o
+	rm -rf srcs/*.o
 
 fclean : clean
 	rm -rf ${NAME}
