@@ -28,7 +28,7 @@ void Client::parsCommands(string buffer, int socketUser){
 			}
 		}
 		else
-			sendToClient(socketUser, "Baucoup trop long, comme ma b*** !\r\n");
+			sendToClient(socketUser, "Beaucoup trop long, comme ma b*** !\r\n");
 	}
 	else if (strncmp(buffer.c_str(), "JOIN #", 6) == 0){
 		cout << "COUCOU" << endl;
