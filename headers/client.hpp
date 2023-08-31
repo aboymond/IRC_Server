@@ -1,9 +1,12 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#define NICK    "NICK"
+
 #include "user.hpp"
 #include "server.hpp"
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -18,7 +21,9 @@ private:
 	User *_userPointer;
 	string _command;
 	string _options;
-	vector <User> _user;
+	//vector <User> _user;
+	map <int, User> _user;
+	map <string, string> _cmd;
 
 public:
 	Client();
@@ -38,6 +43,9 @@ public:
 	vector <User> getUserVector() const;
 
 	int addUser(string buffer, int socketUser);
+	void parsCommands(string buffer, int socketUser);
+	void commandToFunction(string buffer, int socketUser);
+	void join();
 
 	void printOutput(int numofoption, string message, int options, int fd);
 //	void serverPrintOutput(int numofoption, string message, int options, int fd);

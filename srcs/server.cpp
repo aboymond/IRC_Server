@@ -114,12 +114,16 @@ void Server::waitToNewConnection() {
 				if ((val_read = recv(sd, buffer, 1024, 0)) == 0) {
 					//client.eraseUser(sd);
 					//client.printOutput(3, NULL, 0, sd);
+					client.eraseUser(sd);
 					close(sd);
 					_userSocket.erase(_userSocket.begin() + i);
 				} else {
 					buffer[val_read] = '\0';
-					client.addUser(buffer, _userSocket[i]);
-					client.printOutput(1, buffer, i, _userSocket[i]);
+					//client.printOutput(1, buffer, i, _userSocket[i]);
+					if(client.addUser(buffer, _userSocket[i])){
+						client.parsCommands(buffer, _userSocket[i]);
+					}
+
 				}
 			}
 

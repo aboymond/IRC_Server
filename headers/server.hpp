@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <sys/select.h>
+#include <algorithm>
 #include "user.hpp"
 #include "client.hpp"
 
