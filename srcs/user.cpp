@@ -1,4 +1,4 @@
-#include "user.hpp"
+#include "../headers/user.hpp"
 
 User::User() :
 	//_client(),
@@ -67,6 +67,8 @@ void    User::initUserAndNick(string buffer){
     string line;
     size_t i = 5;
     while (std::getline(iss, line, '\n')) {
+		if (line.find("CAP LS") == 0)
+			i = 13;
         if (line.find("NICK ") == 0) {
             while ( i < buffer.length() && buffer[i] != '\r') {
                 nickName.push_back(buffer[i]);
@@ -83,5 +85,4 @@ void    User::initUserAndNick(string buffer){
             setUserName(userName);
         }
     }
-//    std::cout << "nick = " << nickName << " | user = " << userName << std::endl;
 }
