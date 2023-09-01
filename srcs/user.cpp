@@ -5,7 +5,8 @@ User::User() :
 	_nickName(""),
 	_userName(""),
 	_socket_user(0),
-	_moderator(false)
+	_moderator(false),
+	_userCreate(false)
 {
 	cout << "constructor client called" << endl;
 };
@@ -42,6 +43,10 @@ void		User::setOperator(bool moderator){
 	_moderator = moderator;
 }
 
+void 		User::setUserCreate(bool usercreate){
+	_userCreate = usercreate;
+}
+
 // GET
 
 const std::string &User::getNickName() const{
@@ -60,7 +65,11 @@ bool		User::getOperator() const{
 	return (_moderator);
 }
 
-void    User::initUserAndNick(string buffer){
+bool 		User::getUserCreate() const{
+	return (_userCreate);
+}
+
+bool    User::initUserAndNick(string buffer){
     std::string nickName;
     std::string userName;
     istringstream iss(buffer);
@@ -83,6 +92,11 @@ void    User::initUserAndNick(string buffer){
                 i++;
             }
             setUserName(userName);
+
         }
     }
+	cout << "nick in init = " << nickName << endl;
+	if (nickName.empty())
+		return (false);
+	return (true);
 }

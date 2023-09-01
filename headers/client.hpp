@@ -44,8 +44,9 @@ public:
 
 	int addUser(string buffer, int socketUser);
 	void parsCommands(string buffer, int socketUser);
-	void commandToFunction(string buffer, int socketUser);
-	void join();
+//	void commandToFunction(string buffer, int socketUser);
+//	void join();
+	void nick(int socketUser);
 
 	void printOutput(int numofoption, string message, int options, int fd);
 //	void serverPrintOutput(int numofoption, string message, int options, int fd);
