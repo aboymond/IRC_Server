@@ -1,7 +1,7 @@
 #include "../headers/client.hpp"
 #include "../headers/server.hpp"
 
-Client::Client() {};
+Client::Client(){};
 
 Client::Client(const Client &src) {
 	*this = src;
@@ -46,12 +46,14 @@ string Client::getOptions() const {
 }
 
 int Client::addUser(string buffer, int socketUser) {
-	if (_user.find(socketUser) != _user.end()) {
+	if (_user.find(socketUser) != _user.end() && _user[socketUser].getUserCreate() == true) {
 		//printOutput(1, buffer, 0, socketUser);
 		return (-1);
 	}
 	User newUser;
-	newUser.initUserAndNick(buffer);
+
+	if (newUser.initUserAndNick(buffer) == true)
+		_user[socketUser].setUserCreate(true);
 	newUser.setSocketUser(socketUser);
 	_user[socketUser] = newUser;
 	//printOutput(1, buffer, 0, socketUser);

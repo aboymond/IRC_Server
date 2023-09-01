@@ -121,19 +121,13 @@ void Server::waitToNewConnection() {
 					_userSocket.erase(_userSocket.begin() + (int)i);
 				} else {
 					buffer[val_read] = '\0';
+					if(client.addUser(buffer, _userSocket[i])){
 
-					for (size_t j = 0; j < tabCommand[i].length(); ++j) {
-						if ((strncmp(buffer, "CAP LS", 6) == 0 && strlen(buffer) > 8) || strncmp(buffer, tabCommand[j].c_str(), tabCommand[j].length()) == 0) {
-							if(client.addUser(buffer, _userSocket[i])){
-
-								client.parsCommands(buffer, _userSocket[i]);
-								break;
-							}
-						}
+						client.parsCommands(buffer, _userSocket[i]);
+						break;
 					}
-					client.printOutput(1, buffer, 0, _userSocket[i]);
 
-
+					//client.printOutput(1, buffer, 0, _userSocket[i]);
 				}
 			}
 
@@ -141,6 +135,7 @@ void Server::waitToNewConnection() {
 
 
 	}
+	close(_socketServer);
 }
 
 const char *Server::BadArgument::what() const throw() {

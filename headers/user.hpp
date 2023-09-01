@@ -16,6 +16,7 @@ protected:
 	std::string	_userName;
 	int			_socket_user;
 	bool		_moderator;
+	bool		_userCreate;
 
 public:
 
@@ -29,15 +30,17 @@ public:
 	void				setUserName(const std::string &username);
 	void				setSocketUser(int socket_user);
 	void				setOperator(bool moderator);
+	void 				setUserCreate(bool usercreate);
 
 	// GET
 	const std::string	&getNickName() const;
 	const std::string	&getUserName() const;
 	int					getSocketUser() const;
 	bool				getOperator() const;
+	bool 				getUserCreate() const;
 
     // Init nick n username
-    void    initUserAndNick(std::string buffer);
+    bool   initUserAndNick(std::string buffer);
 };
 
 #endif
