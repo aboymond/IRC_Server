@@ -47,14 +47,14 @@ string Client::getOptions() const {
 
 int Client::addUser(string buffer, int socketUser) {
 	if (_user.find(socketUser) != _user.end()) {
-		printOutput(1, buffer, 0, socketUser);
+		//printOutput(1, buffer, 0, socketUser);
 		return (-1);
 	}
 	User newUser;
 	newUser.initUserAndNick(buffer);
 	newUser.setSocketUser(socketUser);
 	_user[socketUser] = newUser;
-	printOutput(1, buffer, 0, socketUser);
+	//printOutput(1, buffer, 0, socketUser);
 
 
 	return (0);

@@ -75,6 +75,7 @@ void Server::createSocketServer() {
 void Server::waitToNewConnection() {
 
 	int max_fd = _socketServer;
+	string tabCommand[] = {"NICK ", "JOIN "};
 	socklen_t addrlen = sizeof(_serverAddress);
 	fd_set readfds;
 	Client client;
@@ -109,20 +110,29 @@ void Server::waitToNewConnection() {
 		for (size_t i = 0; i < _userSocket.size(); i++) {
 			int sd = _userSocket[i];
 			char buffer[1024];
+			memset(buffer, '\0', strlen(buffer));
 			if (FD_ISSET(sd, &readfds)) {
-				int val_read;
+				size_t val_read;
 				if ((val_read = recv(sd, buffer, 1024, 0)) == 0) {
 					//client.eraseUser(sd);
 					//client.printOutput(3, NULL, 0, sd);
 					client.eraseUser(sd);
 					close(sd);
-					_userSocket.erase(_userSocket.begin() + i);
+					_userSocket.erase(_userSocket.begin() + (int)i);
 				} else {
 					buffer[val_read] = '\0';
-					//client.printOutput(1, buffer, i, _userSocket[i]);
-					if(client.addUser(buffer, _userSocket[i])){
-						client.parsCommands(buffer, _userSocket[i]);
+
+					for (size_t j = 0; j < tabCommand[i].length(); ++j) {
+						if ((strncmp(buffer, "CAP LS", 6) == 0 && strlen(buffer) > 8) || strncmp(buffer, tabCommand[j].c_str(), tabCommand[j].length()) == 0) {
+							if(client.addUser(buffer, _userSocket[i])){
+
+								client.parsCommands(buffer, _userSocket[i]);
+								break;
+							}
+						}
 					}
+					client.printOutput(1, buffer, 0, _userSocket[i]);
+
 
 				}
 			}
