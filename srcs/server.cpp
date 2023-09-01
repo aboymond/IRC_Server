@@ -127,7 +127,7 @@ void Server::waitToNewConnection() {
 						break;
 					}
 
-					//client.printOutput(1, buffer, 0, _userSocket[i]);
+					client.printOutput(1, buffer, 0, _userSocket[i]);
 				}
 			}
 

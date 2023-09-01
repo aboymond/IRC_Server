@@ -47,6 +47,7 @@ public:
 //	void commandToFunction(string buffer, int socketUser);
 //	void join();
 	void nick(int socketUser);
+	void join(int socketUser);
 
 	void printOutput(int numofoption, string message, int options, int fd);
 //	void serverPrintOutput(int numofoption, string message, int options, int fd);
