@@ -95,7 +95,6 @@ bool    User::initUserAndNick(string buffer){
 
         }
     }
-	cout << "nick in init = " << nickName << endl;
 	if (nickName.empty())
 		return (false);
 	return (true);
