@@ -15,12 +15,16 @@ class User {
 
 protected:
 	//Client		*_client;
+
 	std::string						_nickName;
 	std::string						_userName;
 	int								_socket_user;
 	bool							_moderator;
 	bool							_userCreate;
 	std::vector<std::string>		_channelName;
+
+	bool		_PasswordIsValid;
+
 
 public:
 
@@ -36,6 +40,7 @@ public:
 	void				setOperator(bool moderator);
 	void 				setUserCreate(bool usercreate);
 	void 				setChannelName(std::string &channelname);
+	void 				setPasswordIsValid( bool passWordIsValid );
 
 	// GET
 	const std::string	&getNickName() const;
@@ -44,6 +49,7 @@ public:
 	bool				getOperator() const;
 	bool 				getUserCreate() const;
 	bool 				searchChannel(std::string channelName);
+	bool 				getPasswordIsValid() const;
 
     // Init nick n username
     bool   initUserAndNick(std::string buffer);

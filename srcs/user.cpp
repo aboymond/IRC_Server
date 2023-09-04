@@ -6,9 +6,10 @@ User::User() :
 	_userName(""),
 	_socket_user(0),
 	_moderator(false),
-	_userCreate(false)
+	_userCreate(false),
+	_PasswordIsValid(false)
 {
-	cout << "constructor client called" << endl;
+	cout << "constructor user called" << endl;
 };
 
 User::~User() {};
@@ -51,6 +52,10 @@ void 		User::setChannelName(std::string &channelname){
 	_channelName.push_back(channelname);
 }
 
+void 		User::setPasswordIsValid(bool passWordIsValid) {
+	_PasswordIsValid = passWordIsValid;
+}
+
 // GET
 
 const std::string &User::getNickName() const{
@@ -73,6 +78,7 @@ bool 		User::getUserCreate() const{
 	return (_userCreate);
 }
 
+
 bool 	User::searchChannel(std::string channelName){
 	for (size_t i = 0; i < _channelName.size(); i++){
 		if (strcmp(_channelName[i].c_str(), channelName.c_str()) == 0){
@@ -80,6 +86,11 @@ bool 	User::searchChannel(std::string channelName){
 		}
 	}
 	return (false);
+}
+
+bool 		User::getPasswordIsValid() const{
+	return (_PasswordIsValid);
+
 }
 
 bool    User::initUserAndNick(string buffer){

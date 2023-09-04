@@ -121,12 +121,17 @@ void Server::waitToNewConnection() {
 					_userSocket.erase(_userSocket.begin() + (int)i);
 				} else {
 					buffer[val_read] = '\0';
-					if(client.addUser(buffer, _userSocket[i])){
 
-						client.parsCommands(buffer, _userSocket[i]);
+					if(client.addUser(buffer, _userSocket[i])) {
+						if (client.GetStatusPasswordClient(_userSocket[i]) == false)
+						{
+							if (client.userCanExecuteCommand(_password, _userSocket[i], buffer) == false)
+								client.sendToClient(_userSocket[i], "entrer un mot de passe pour executer le serveur\r\n");
+						}
+						else
+							client.parsCommands(buffer, _userSocket[i]);
 						break;
 					}
-
 					client.printOutput(1, buffer, 0, _userSocket[i]);
 				}
 			}

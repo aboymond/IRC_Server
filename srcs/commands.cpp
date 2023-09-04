@@ -6,7 +6,7 @@ void Client::parsCommands(string buffer, int socketUser){
 //	transform(buffer.begin(), buffer.end(), buffer.begin(), ::toupper);
 //	cout << "UPPER APRES = " << buffer << endl;
 	printOutput(1, buffer, 0, socketUser);
-	if (strncmp(buffer.c_str(), "NICK ", 5) == 0 ){
+	if (strncmp(buffer.c_str(), "NICK ", 5) == 0){
 		if (buffer.length() < 25){
 			size_t space = buffer.find(' ');
 			if (space < 5) {
@@ -19,7 +19,8 @@ void Client::parsCommands(string buffer, int socketUser){
 		else
 			sendToClient(socketUser, "Beaucoup trop long, comme ma b*** !\r\n");
 	}
-	else if (strncmp(buffer.c_str(), "JOIN #", 6) == 0){
+	else if (strncmp(buffer.c_str(), "JOIN #", 6) == 0) {
+
 		if (buffer.length() < 25){
 			size_t space = buffer.find(' ');
 			if (space < 5) {
@@ -58,12 +59,12 @@ void Client::join(int socketUser){
 		std::map<string, string>::iterator it;
 		it = _cmd.begin();
 		User checkUser = _user[socketUser];
-		//checkUser.setNickName(_cmd[JOIN]);
 		if (checkChannelExist(it->second) == false){
 			_user[socketUser].setChannelName(_cmd[JOIN]);
 			_user[socketUser].setOperator(true);
 			cout << _user[socketUser].getNickName() << " is operator !" << endl;
 		}
+
 		string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
 						  "@localhost " + "JOIN #" + it->second + "\r\n";
 
