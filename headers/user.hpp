@@ -17,6 +17,7 @@ protected:
 	int			_socket_user;
 	bool		_moderator;
 	bool		_userCreate;
+	bool		_PasswordIsValid;
 
 public:
 
@@ -31,6 +32,7 @@ public:
 	void				setSocketUser(int socket_user);
 	void				setOperator(bool moderator);
 	void 				setUserCreate(bool usercreate);
+	void 				setPasswordIsValid( bool passWordIsValid );
 
 	// GET
 	const std::string	&getNickName() const;
@@ -38,6 +40,7 @@ public:
 	int					getSocketUser() const;
 	bool				getOperator() const;
 	bool 				getUserCreate() const;
+	bool 				getPasswordIsValid() const;
 
     // Init nick n username
     bool   initUserAndNick(std::string buffer);

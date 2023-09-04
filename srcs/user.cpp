@@ -6,9 +6,10 @@ User::User() :
 	_userName(""),
 	_socket_user(0),
 	_moderator(false),
-	_userCreate(false)
+	_userCreate(false),
+	_PasswordIsValid(false)
 {
-	cout << "constructor client called" << endl;
+	cout << "constructor user called" << endl;
 };
 
 User::~User() {};
@@ -47,6 +48,10 @@ void 		User::setUserCreate(bool usercreate){
 	_userCreate = usercreate;
 }
 
+void 		User::setPasswordIsValid(bool passWordIsValid) {
+	_PasswordIsValid = passWordIsValid;
+}
+
 // GET
 
 const std::string &User::getNickName() const{
@@ -67,6 +72,10 @@ bool		User::getOperator() const{
 
 bool 		User::getUserCreate() const{
 	return (_userCreate);
+}
+
+bool 		User::getPasswordIsValid() const{
+	return (_PasswordIsValid);
 }
 
 bool    User::initUserAndNick(string buffer){
