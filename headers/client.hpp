@@ -2,6 +2,7 @@
 #define CLIENT_HPP
 
 #define NICK    "NICK"
+#define JOIN    "JOIN"
 
 #include "user.hpp"
 #include "server.hpp"
@@ -44,6 +45,7 @@ public:
 
 	int addUser(string buffer, int socketUser);
 	void parsCommands(string buffer, int socketUser);
+	bool checkChannelExist(std::string channelname);
 //	void commandToFunction(string buffer, int socketUser);
 //	void join();
 	void nick(int socketUser);

@@ -68,3 +68,11 @@ void Client::eraseUser(int socketUser){
 	}
 
 }
+
+bool Client::checkChannelExist(std::string channelname){
+	for (size_t i = 0; i < _user.size(); i++ ){
+		if (_user[i].searchChannel(channelname) == true)
+			return (true);
+	}
+	return (false);
+}
