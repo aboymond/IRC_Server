@@ -11,7 +11,7 @@ void Client::parsCommands(string buffer, int socketUser){
 			size_t space = buffer.find(' ');
 			if (space < 5) {
 				string command = buffer.substr(0, 4);
-				string nickname = buffer.substr(space + 1, buffer.length() - space - 3);
+				string nickname = buffer.substr(space + 1, buffer.length() - space - 4);
 				_cmd[command] = nickname;
 				nick(socketUser);
 			}
@@ -25,16 +25,23 @@ void Client::parsCommands(string buffer, int socketUser){
 			size_t space = buffer.find(' ');
 			if (space < 5) {
 				string command = buffer.substr(0, 4);
-				string channel = buffer.substr(space + 2, buffer.length() - space - 3);
+				string channel = buffer.substr(space + 2, buffer.length() - space - 4);
 				_cmd[command] = channel;
+				cout << "cmd = " << command << " | channel = " << channel << endl;
 				join(socketUser);
 			}
 		}
 		else
 			sendToClient(socketUser, "Beaucoup trop long, comme ma b*** !\r\n");
 	}
-	else
-		cout << "peut etre dans chan" << endl;
+	else if (strncmp(buffer.c_str(), "PRIVMSG ", 8) == 0){
+		string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
+						  "@localhost " + buffer;
+		for (size_t i = 0; i < _user.size(); i++)
+			if (_user[i].getSocketUser() != socketUser)
+				sendToClient(_user[i].getSocketUser(), response);
+	}
+
 }
 
 //void Client::commandToFunction(string buffer, int socketUser){
@@ -52,13 +59,18 @@ void Client::join(int socketUser){
 		std::map<string, string>::iterator it;
 		it = _cmd.begin();
 		User checkUser = _user[socketUser];
-		checkUser.setNickName(_cmd[JOIN]);
+		if (checkChannelExist(it->second) == false){
+			_user[socketUser].setChannelName(_cmd[JOIN]);
+			_user[socketUser].setOperator(true);
+			cout << _user[socketUser].getNickName() << " is operator !" << endl;
+		}
+
 		string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
 						  "@localhost " + "JOIN #" + it->second + "\r\n";
 
 
 		sendToClient(socketUser, response);
-		_user[socketUser] = checkUser;
+		//_user[socketUser] = checkUser;
 	}
 }
 
@@ -66,13 +78,13 @@ void Client::nick(int socketUser){
 	if (_user.find(socketUser) != _user.end()){
 			std::map<string, string>::iterator it;
 			it = _cmd.begin();
-		User checkUser = _user[socketUser];
-		checkUser.setNickName(_cmd[NICK]);
+		//User checkUser = _user[socketUser];
+		_user[socketUser].setNickName(_cmd[NICK]);
 		string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
 						  "@localhost " + "NICK :" + it->second + "\r\n";
 
 
 		sendToClient(socketUser, response);
-		_user[socketUser] = checkUser;
+		//_user[socketUser] = checkUser;
 	}
 }

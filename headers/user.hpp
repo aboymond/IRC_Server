@@ -2,9 +2,12 @@
 #define USER_HPP
 
 #include <string>
+#include <string.h>
 #include <iostream>
 #include <unistd.h>
+#include <vector>
 #include <sstream>
+#include <cstdio>
 #include "client.hpp"
 
 
@@ -12,12 +15,16 @@ class User {
 
 protected:
 	//Client		*_client;
-	std::string	_nickName;
-	std::string	_userName;
-	int			_socket_user;
-	bool		_moderator;
-	bool		_userCreate;
+
+	std::string						_nickName;
+	std::string						_userName;
+	int								_socket_user;
+	bool							_moderator;
+	bool							_userCreate;
+	std::vector<std::string>		_channelName;
+
 	bool		_PasswordIsValid;
+
 
 public:
 
@@ -32,6 +39,7 @@ public:
 	void				setSocketUser(int socket_user);
 	void				setOperator(bool moderator);
 	void 				setUserCreate(bool usercreate);
+	void 				setChannelName(std::string &channelname);
 	void 				setPasswordIsValid( bool passWordIsValid );
 
 	// GET
@@ -40,6 +48,7 @@ public:
 	int					getSocketUser() const;
 	bool				getOperator() const;
 	bool 				getUserCreate() const;
+	bool 				searchChannel(std::string channelName);
 	bool 				getPasswordIsValid() const;
 
     // Init nick n username

@@ -45,8 +45,12 @@ public:
 
 	int addUser(string buffer, int socketUser);
 	void parsCommands(string buffer, int socketUser);
+
+	bool checkChannelExist(std::string channelname);
+
 	bool userCanExecuteCommand(string password, int userSocket, string buffer);
 	bool GetStatusPasswordClient(int socketUser);
+
 //	void commandToFunction(string buffer, int socketUser);
 //	void join();
 	void nick(int socketUser);

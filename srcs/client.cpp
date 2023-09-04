@@ -77,6 +77,12 @@ bool Client::userCanExecuteCommand(string password, int userSocket, string buffe
 	return (false);
 }
 
+bool Client::checkChannelExist(std::string channelname){
+	for (size_t i = 0; i < _user.size(); i++ ){
+		if (_user[i].searchChannel(channelname) == true)
+			return (true);
+	}
+	return (false);
 bool Client::GetStatusPasswordClient(int socketUser) {
 	return (_user[socketUser].getPasswordIsValid());
 }

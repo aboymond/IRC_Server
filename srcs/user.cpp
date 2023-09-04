@@ -48,6 +48,10 @@ void 		User::setUserCreate(bool usercreate){
 	_userCreate = usercreate;
 }
 
+void 		User::setChannelName(std::string &channelname){
+	_channelName.push_back(channelname);
+}
+
 void 		User::setPasswordIsValid(bool passWordIsValid) {
 	_PasswordIsValid = passWordIsValid;
 }
@@ -74,8 +78,19 @@ bool 		User::getUserCreate() const{
 	return (_userCreate);
 }
 
+
+bool 	User::searchChannel(std::string channelName){
+	for (size_t i = 0; i < _channelName.size(); i++){
+		if (strcmp(_channelName[i].c_str(), channelName.c_str()) == 0){
+			return (true);
+		}
+	}
+	return (false);
+}
+
 bool 		User::getPasswordIsValid() const{
 	return (_PasswordIsValid);
+
 }
 
 bool    User::initUserAndNick(string buffer){
