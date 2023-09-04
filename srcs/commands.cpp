@@ -37,9 +37,9 @@ void Client::parsCommands(string buffer, int socketUser){
 	else if (strncmp(buffer.c_str(), "PRIVMSG ", 8) == 0){
 		string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
 						  "@localhost " + buffer;
-		for (size_t i = 0; i < _user.size(); i++)
+		for (size_t i = 3; i < _user.size(); i++)
 			if (_user[i].getSocketUser() != socketUser)
-				sendToClient(_user[i].getSocketUser(), response);
+				sendToClient(_user[socketUser].getSocketUser(), response);
 	}
 
 }
