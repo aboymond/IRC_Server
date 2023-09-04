@@ -57,8 +57,6 @@ int Client::addUser(string buffer, int socketUser) {
 	newUser.setSocketUser(socketUser);
 	_user[socketUser] = newUser;
 	//printOutput(1, buffer, 0, socketUser);
-
-
 	return (0);
 }
 
@@ -66,5 +64,19 @@ void Client::eraseUser(int socketUser){
 	if(_user.find(socketUser) != _user.end()){
 		_user.erase(socketUser);
 	}
+}
 
+bool Client::userCanExecuteCommand(string password, int userSocket, string buffer) {
+	int deletechar = buffer.length();
+	buffer = buffer.substr(0, deletechar - 2);
+	if (password == buffer)
+	{
+		_user[userSocket].setPasswordIsValid(true);
+		return (true);
+	}
+	return (false);
+}
+
+bool Client::GetStatusPasswordClient(int socketUser) {
+	return (_user[socketUser].getPasswordIsValid());
 }
