@@ -29,7 +29,7 @@ using namespace std;
 //#define IP_SERV "127.0.0.1"
 
 
-#define IP_SERV "10.13.5.2"
+#define IP_SERV "10.13.3.5"
 
 //#define IP_SERV "127.0.0.1"
 

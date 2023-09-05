@@ -9,6 +9,7 @@ void Server::serverPrintOutput(int port, int socketserver) {
 
 	cout << "IP [ \033[1;34m" << IP_SERV << "\033[0m ]" << endl;
 	cout << "PORT [ \033[1;34m" << port << "\033[0m ]" << endl;
+	cout << "PASSWORD [ \033[1;34m" << _password << "\033[0m ]" << endl;
 	cout << "SOCKET SERVER [ \033[1;34m" << socketserver << "\033[0m ]" << endl;
 
 	cout << "\033[1;34m----------------------------\033[0m\n" << endl;

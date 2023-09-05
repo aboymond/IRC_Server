@@ -39,7 +39,7 @@ public:
 	void				setSocketUser(int socket_user);
 	void				setOperator(bool moderator);
 	void 				setUserCreate(bool usercreate);
-	void 				setChannelName(std::string &channelname);
+	void 				setChannelName(std::string channelname);
 	void 				setPasswordIsValid( bool passWordIsValid );
 
 	// GET
@@ -48,7 +48,7 @@ public:
 	int					getSocketUser() const;
 	bool				getOperator() const;
 	bool 				getUserCreate() const;
-	bool 				searchChannel(std::string channelName);
+	bool 				searchChannel(std::string channelName) const;
 	bool 				getPasswordIsValid() const;
 
     // Init nick n username
