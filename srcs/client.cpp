@@ -72,6 +72,7 @@ bool Client::userCanExecuteCommand(string password, int userSocket, string buffe
 	if (password == buffer)
 	{
 		_user[userSocket].setPasswordIsValid(true);
+		sendToClient(userSocket, "Password valid. You can execute some commands\r\n");
 		return (true);
 	}
 	return (false);
