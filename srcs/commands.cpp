@@ -21,10 +21,17 @@ void Client::parsCommands(string buffer, int socketUser){
 			sendToClient(socketUser, "Beaucoup trop long, comme ma b*** !\r\n");
 	}
 	else if (strncmp(buffer.c_str(), "WHO ", 4) == 0) {
-		std::string response2 = ":" + (string)IP_SERV + " 353 " + _user[socketUser].getNickName() + " = #" + _cmd[JOIN] + " :@" + _user[socketUser].getNickName() + "\r\n"
-								":" + (string)IP_SERV + " 315" + _user[socketUser].getNickName() +
-								":" + (string)IP_SERV + " " + _user[socketUser].getNickName() + " #" + _cmd[JOIN] + " :End of /WHO list.\r\n";
-		sendToClient(socketUser, response2);
+		if (_who == true) {
+			< :*.freenode.net 354 piow00 152 #test42 piow00 :H@
+			< :*.freenode.net 354 piow00 152 #test42 qbonvin :H
+				< :*.freenode.net 315 piow00 #test42 :End of /WHO list.
+		}
+		else{
+			std::string response2 = ":" + (string)IP_SERV + " 353 " + _user[socketUser].getNickName() + " = #" + _cmd[JOIN] + " :@" + _user[socketUser].getNickName() + "\r\n"
+									":" + (string)IP_SERV + " 315" + _user[socketUser].getNickName() +
+									":" + (string)IP_SERV + " " + _user[socketUser].getNickName() + " #" + _cmd[JOIN] + " :End of /WHO list.\r\n";
+			sendToClient(socketUser, response2);
+		}
 	}
 	else if (strncmp(buffer.c_str(), "JOIN #", 6) == 0) {
 
@@ -49,7 +56,7 @@ void Client::parsCommands(string buffer, int socketUser){
 			//cout << "it->first = " << it->first << endl;
 			if (currentUser.getSocketUser() != socketUser) {
 				std::string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-				                       "@localhost " + currentUser.getNickName() + " :" + buffer + "\r\n";
+				                       "@localhost " + buffer + "\r\n";
 
 				sendToClient(currentUser.getSocketUser(), response);
 			}
