@@ -9,6 +9,7 @@
 #include <sstream>
 #include <cstdio>
 #include "client.hpp"
+#include <map>
 
 
 class User {
@@ -22,6 +23,8 @@ protected:
 	bool							_moderator;
 	bool							_userCreate;
 	std::vector<std::string>		_channelName;
+
+	bool 							_who;
 
 	bool		_PasswordIsValid;
 
@@ -41,6 +44,8 @@ public:
 	void 				setUserCreate(bool usercreate);
 	void 				setChannelName(std::string channelname);
 	void 				setPasswordIsValid( bool passWordIsValid );
+	void 				setWho(bool who);
+
 
 	// GET
 	const std::string	&getNickName() const;
@@ -50,6 +55,8 @@ public:
 	bool 				getUserCreate() const;
 	bool 				searchChannel(std::string channelName) const;
 	bool 				getPasswordIsValid() const;
+	bool 				getWho() const;
+
 
     // Init nick n username
     bool   initUserAndNick(std::string buffer);

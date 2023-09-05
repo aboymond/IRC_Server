@@ -25,6 +25,8 @@ private:
 	//vector <User> _user;
 	map <int, User> _user;
 	map <string, string> _cmd;
+	string _currentOP;
+	std::map <std::string, std::string>	_whoIsOP;
 
 public:
 	Client();
@@ -35,7 +37,10 @@ public:
 
 	~Client();
 
-	string getCommand() const;
+	void			setWhoIsOP(std::string channel, std::string nickname);
+	std::string 	getWhoIsOP_Nick(std::string channel);
+
+	string	getCommand() const;
 
 	string getOptions() const;
 
