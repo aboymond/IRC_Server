@@ -77,12 +77,15 @@ bool Client::userCanExecuteCommand(string password, int userSocket, string buffe
 	return (false);
 }
 
-bool Client::checkChannelExist(std::string channelname) {
-	for (size_t i = 0; i < _user.size(); i++) {
-		if (_user[i].searchChannel(channelname) == true)
-			return (true);
+bool Client::checkChannelExist(std::string channelName) {
+	std::map<int, User>::iterator it;
+	for (it = _user.begin(); it != _user.end(); ++it) {
+		const User& currentUser = it->second;
+		if (currentUser.searchChannel(channelName)) {
+			return true;
+		}
 	}
-	return (false);
+	return false;
 }
 
 bool Client::GetStatusPasswordClient(int socketUser) {
