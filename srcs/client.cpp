@@ -19,23 +19,6 @@ Client &Client::operator=(const Client &rhs) {
 
 Client::~Client() {};
 
-//const User& Client::getUser(int usersocket) const {
-//	for (size_t i = 0; i < _user.size(); i++) {
-//		const User &checkUser = _user[i];
-//		cout << "usersocket = " << usersocket << "_user = " << checkUser.getSocketUser() << endl;
-//		if (checkUser.getSocketUser() == usersocket) {
-//			return (_user[i]);
-//		}
-//	}
-//	//return (_user[i]);
-//
-//	throw std::runtime_error("User not found");
-//
-//}
-
-//vector <User> Client::getUserVector() const {
-//	return (this->_user);
-//}
 
 string Client::getCommand() const {
 	return (this->_command);
