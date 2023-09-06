@@ -1,12 +1,12 @@
 #include "../headers/user.hpp"
 
 User::User() :
-	//_client(),
 	_nickName(""),
 	_userName(""),
 	_socket_user(0),
 	_moderator(false),
 	_userCreate(false),
+	_who(false),
 	_PasswordIsValid(false)
 {
 	cout << "constructor user called" << endl;
@@ -57,6 +57,12 @@ void 		User::setPasswordIsValid(bool passWordIsValid) {
 	_PasswordIsValid = passWordIsValid;
 }
 
+void 		User::setWho(bool who) {
+	_who = who;
+}
+
+
+
 // GET
 
 const std::string &User::getNickName() const{
@@ -79,9 +85,15 @@ bool 		User::getUserCreate() const{
 	return (_userCreate);
 }
 
+
+bool 		User::getWho() const {
+	return (_who);
+}
+
 vector<string>	User::getChannelName() const{
 	return (_channelName);
 }
+
 
 bool User::searchChannel(std::string channelName) const {
 	for (std::vector<std::string>::const_iterator it = _channelName.begin(); it != _channelName.end(); ++it){

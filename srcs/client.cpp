@@ -45,6 +45,19 @@ string Client::getOptions() const {
 	return (this->_options);
 }
 
+void 		Client::setWhoIsOP(std::string channel, std::string nickname) {
+	_whoIsOP.insert(std::make_pair(channel, nickname));
+}
+
+std::string Client::getWhoIsOP_Nick(std::string channel) {
+	string tmp_nick = "";
+	if(_whoIsOP.find(channel) != _whoIsOP.end()){
+		tmp_nick = _whoIsOP[channel];
+
+	}
+	return (tmp_nick);
+}
+
 int Client::addUser(string buffer, int socketUser) {
 	if (_user.find(socketUser) != _user.end() && _user[socketUser].getUserCreate() == true) {
 		//printOutput(1, buffer, 0, socketUser);
