@@ -51,6 +51,7 @@ public:
 	int addUser(string buffer, int socketUser);
 	void parsCommands(string buffer, int socketUser);
 
+	string	extractChannelName(string buffer);
 	bool checkChannelExist(std::string channelname);
 
 	bool userCanExecuteCommand(string password, int userSocket, string buffer);

@@ -23,6 +23,7 @@ User &User::operator=(User const &rhs){
 		_userName = 	rhs._userName;
 		_socket_user = 	rhs._socket_user;
 		_moderator = 	rhs._moderator;
+		_channelName = rhs._channelName;
 	}
 	return (*this);
 }
@@ -84,11 +85,14 @@ bool 		User::getUserCreate() const{
 	return (_userCreate);
 }
 
+
 bool 		User::getWho() const {
 	return (_who);
 }
 
-
+vector<string>	User::getChannelName() const{
+	return (_channelName);
+}
 
 
 bool User::searchChannel(std::string channelName) const {

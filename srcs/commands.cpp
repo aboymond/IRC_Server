@@ -60,8 +60,8 @@ void Client::parsCommands(string buffer, int socketUser){
 				sendToClient(socketUser, response4);
 			}
 			_user[socketUser].setWho(true);
-		}
-	}
+
+    }
 	else if (strncmp(buffer.c_str(), "JOIN #", 6) == 0) {
 
 		if (buffer.length() < 25){
@@ -91,8 +91,50 @@ void Client::parsCommands(string buffer, int socketUser){
 			}
 		}
 
-
 	}
+	else if (strncmp(buffer.c_str(), "KICK #", 6) == 0)
+	{
+//		std::string input = ":USER1!~USER1@localhost KICK #testtest USER1 :USER1";
+
+		map<int, User>::iterator it;
+		vector<string>::iterator it_channel;
+		string channel = extractChannelName(buffer);
+		string commandAndChannel = "KICK #" + channel;
+//		cout << commandAndChannel << endl;
+//		string response = ":USER1!~USER1@localhost KICK #testtest USER1 :USER1\r\n";
+		size_t found = buffer.find_last_of(' ');
+		string userToKick = buffer.substr(found+1);
+		string userToKick2 = userToKick.erase(userToKick.length()-2);
+		string response = ":" + userToKick + "!~" + userToKick + "@localhost " + commandAndChannel + " " + userToKick + " :" + userToKick + "\r\n";
+		cout << "response = " << response;
+//		cout << "userToKick = " << userToKick << endl;
+		if (checkChannelExist(channel) == true)
+		{
+			for (it = _user.begin(); it != _user.end(); it++)
+			{
+				User &currentUser = it->second;
+				for (it_channel = currentUser.getChannelName().begin(); it_channel < currentUser.getChannelName().end(); ++it_channel) {
+					if (*it_channel == "testtest") {
+//						cout << "test" << endl;
+						sendToClient(socketUser, response);
+					}
+				}
+				sendToClient(socketUser, "there is no channel\r\n");
+			}
+
+		}
+//		else
+//		qbonvin!~qbonvin@freenode-o6d.g28.dc9e5h.IP KICK #testtest qbonvin :qbonvin
+	}
+}
+
+string Client::extractChannelName(string buffer) {
+	//Recherchez le caractère '#' dans la chaîne
+	size_t found = buffer.find('#');
+	found += 1;
+	//Trouvé le caractère '#', maintenant, extrayez le nom du canal
+	string channel = buffer.substr(found, buffer.find(' ', found) - found);
+	return (channel);
 }
 
 void Client::join(int socketUser){
@@ -101,6 +143,7 @@ void Client::join(int socketUser){
 		it = _cmd.begin();
 		User checkUser = _user[socketUser];
 		if (checkChannelExist(it->second) != true){
+
 			_user[socketUser].setChannelName(_cmd[JOIN]);
 			_user[socketUser].setOperator(true);
 			setWhoIsOP(_cmd[JOIN], _user[socketUser].getNickName());
