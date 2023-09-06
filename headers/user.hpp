@@ -48,6 +48,7 @@ public:
 	int					getSocketUser() const;
 	bool				getOperator() const;
 	bool 				getUserCreate() const;
+	std::vector<std::string> getChannelName() const;
 	bool 				searchChannel(std::string channelName) const;
 	bool 				getPasswordIsValid() const;
 

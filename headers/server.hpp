@@ -29,9 +29,9 @@ using namespace std;
 //#define IP_SERV "127.0.0.1"
 
 
-#define IP_SERV "10.13.3.5"
+//#define IP_SERV "10.13.3.5"
 
-//#define IP_SERV "127.0.0.1"
+#define IP_SERV "127.0.0.1"
 
 
 //#define IP_SERV "10.11.12.1" // IP 42 Alex

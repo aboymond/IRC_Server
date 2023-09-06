@@ -21,18 +21,18 @@ void Client::parsCommands(string buffer, int socketUser){
 			sendToClient(socketUser, "Beaucoup trop long, comme ma b*** !\r\n");
 	}
 	else if (strncmp(buffer.c_str(), "WHO ", 4) == 0) {
-		if (_who == true) {
-			< :*.freenode.net 354 piow00 152 #test42 piow00 :H@
-			< :*.freenode.net 354 piow00 152 #test42 qbonvin :H
-				< :*.freenode.net 315 piow00 #test42 :End of /WHO list.
-		}
-		else{
+//		if (_who == true) {
+//			< :*.freenode.net 354 piow00 152 #test42 piow00 :H@
+//			< :*.freenode.net 354 piow00 152 #test42 qbonvin :H
+//				< :*.freenode.net 315 piow00 #test42 :End of /WHO list.
+//		}
+//		else{
 			std::string response2 = ":" + (string)IP_SERV + " 353 " + _user[socketUser].getNickName() + " = #" + _cmd[JOIN] + " :@" + _user[socketUser].getNickName() + "\r\n"
 									":" + (string)IP_SERV + " 315" + _user[socketUser].getNickName() +
 									":" + (string)IP_SERV + " " + _user[socketUser].getNickName() + " #" + _cmd[JOIN] + " :End of /WHO list.\r\n";
 			sendToClient(socketUser, response2);
 		}
-	}
+//	}
 	else if (strncmp(buffer.c_str(), "JOIN #", 6) == 0) {
 
 		if (buffer.length() < 25){
@@ -62,15 +62,57 @@ void Client::parsCommands(string buffer, int socketUser){
 			}
 		}
 
-
 	}
+	else if (strncmp(buffer.c_str(), "KICK #", 6) == 0)
+	{
+//		std::string input = ":USER1!~USER1@localhost KICK #testtest USER1 :USER1";
+
+		map<int, User>::iterator it;
+		vector<string>::iterator it_channel;
+		string channel = extractChannelName(buffer);
+		string commandAndChannel = "KICK #" + channel;
+//		cout << commandAndChannel << endl;
+//		string response = ":USER1!~USER1@localhost KICK #testtest USER1 :USER1\r\n";
+		size_t found = buffer.find_last_of(' ');
+		string userToKick = buffer.substr(found+1);
+		string userToKick2 = userToKick.erase(userToKick.length()-2);
+		string response = ":" + userToKick + "!~" + userToKick + "@localhost " + commandAndChannel + " " + userToKick + " :" + userToKick + "\r\n";
+		cout << "response = " << response;
+//		cout << "userToKick = " << userToKick << endl;
+		if (checkChannelExist(channel) == true)
+		{
+			for (it = _user.begin(); it != _user.end(); it++)
+			{
+				User &currentUser = it->second;
+				for (it_channel = currentUser.getChannelName().begin(); it_channel < currentUser.getChannelName().end(); ++it_channel) {
+					if (*it_channel == "testtest") {
+//						cout << "test" << endl;
+						sendToClient(socketUser, response);
+					}
+				}
+				sendToClient(socketUser, "there is no channel\r\n");
+			}
+
+		}
+//		else
+//		qbonvin!~qbonvin@freenode-o6d.g28.dc9e5h.IP KICK #testtest qbonvin :qbonvin
+	}
+}
+
+string Client::extractChannelName(string buffer) {
+	//Recherchez le caractère '#' dans la chaîne
+	size_t found = buffer.find('#');
+	found += 1;
+	//Trouvé le caractère '#', maintenant, extrayez le nom du canal
+	string channel = buffer.substr(found, buffer.find(' ', found) - found);
+	return (channel);
 }
 
 void Client::join(int socketUser){
 	if (_user.find(socketUser) != _user.end()){
 		std::map<string, string>::iterator it;
 		it = _cmd.begin();
-		User checkUser = _user[socketUser];
+//		User checkUser = _user[socketUser];
 		if (checkChannelExist(it->second) == false){
 			_user[socketUser].setChannelName(_cmd[JOIN]);
 			_user[socketUser].setOperator(true);
