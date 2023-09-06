@@ -71,12 +71,14 @@ void Client::parsCommands(string buffer, int socketUser){
 		vector<string>::iterator it_channel;
 		string channel = extractChannelName(buffer);
 		string commandAndChannel = "KICK #" + channel;
-		cout << commandAndChannel << endl;
-		size_t start = buffer.find(commandAndChannel);
-		size_t end = buffer.size();
-		string response = ":USER1!~USER1@localhost KICK #testtest USER1 :USER1\r\n";
-		string userToKick = buffer.substr(start, end - 2);
-		cout << "userToKick = " << userToKick << endl;
+//		cout << commandAndChannel << endl;
+//		string response = ":USER1!~USER1@localhost KICK #testtest USER1 :USER1\r\n";
+		size_t found = buffer.find_last_of(' ');
+		string userToKick = buffer.substr(found+1);
+		string userToKick2 = userToKick.erase(userToKick.length()-2);
+		string response = ":" + userToKick + "!~" + userToKick + "@localhost " + commandAndChannel + " " + userToKick + " :" + userToKick + "\r\n";
+		cout << "response = " << response;
+//		cout << "userToKick = " << userToKick << endl;
 		if (checkChannelExist(channel) == true)
 		{
 			for (it = _user.begin(); it != _user.end(); it++)
