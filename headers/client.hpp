@@ -1,8 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#define NICK    "NICK"
-#define JOIN    "JOIN"
+#define NBR_OF_CMD 6
 
 #include "user.hpp"
 #include "server.hpp"
@@ -46,6 +45,7 @@ public:
 	void join();
 	void who();
 	void kick();
+	void pass();
 	void privmsg();
 
 	//CHANNEL

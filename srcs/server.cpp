@@ -1,10 +1,10 @@
 #include "../headers/server.hpp"
 
 Server::Server() :
-		_socketServer(0),
-		_port(0),
-		_password("Default"),
-		_validPassword(false) {
+	_socketServer(0),
+	_port(0),
+	_password("Default"),
+	_validPassword(false) {
 
 };
 
@@ -75,7 +75,6 @@ void Server::createSocketServer() {
 void Server::waitToNewConnection() {
 
 	int max_fd = _socketServer;
-	string tabCommand[] = {"NICK ", "JOIN "};
 	socklen_t addrlen = sizeof(_serverAddress);
 	fd_set readfds;
 	Client client;
@@ -114,8 +113,6 @@ void Server::waitToNewConnection() {
 			if (FD_ISSET(sd, &readfds)) {
 				size_t val_read;
 				if ((val_read = recv(sd, buffer, 1024, 0)) == 0) {
-					//client.eraseUser(sd);
-					//client.printOutput(3, NULL, 0, sd);
 					client.eraseUser(sd);
 					close(sd);
 					_userSocket.erase(_userSocket.begin() + (int)i);
@@ -124,10 +121,14 @@ void Server::waitToNewConnection() {
 
 
 					if(client.addUser(buffer, sd)) {
-						if (client.getStatusPasswordClient(sd) == false)
+						if (passwordVerifier(sd) == false)
 						{
-							if (client.userCanExecuteCommand(_password, sd, buffer) == false)
-								client.sendToClient(sd, "entrer un mot de passe pour executer le serveur\r\n");
+							client.sendToClient(sd, "Enter the password with /PASS\r\n");
+							client.setClientSocket(sd);
+							client.parsCommands(buffer);
+							client.checkAndExecuteCmd();
+//							if (client.userCanExecuteCommand(_password, sd, buffer) == false)
+//								client.sendToClient(sd, "entrer un mot de passe pour executer le serveur\r\n");
 						}
 						else {
 							client.setClientSocket(sd);
@@ -165,4 +166,14 @@ std::ostream &operator<<(std::ostream &o, Server const &i) {
 	  << i.getPassword() << "\n"
 	                        "Password status: " << i.getValidPassword() << "\n";
 	return (o);
+}
+
+bool Server::passwordVerifier(int socketUser) {
+	(void)socketUser;
+	if (getValidPassword() == false) {
+
+		return (false);
+	}
+	else
+		return (true);
 }

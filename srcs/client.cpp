@@ -1,5 +1,4 @@
 #include "../headers/client.hpp"
-#include "../headers/server.hpp"
 
 Client::Client(){};
 
