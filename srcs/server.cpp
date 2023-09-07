@@ -122,17 +122,23 @@ void Server::waitToNewConnection() {
 				} else {
 					buffer[val_read] = '\0';
 
-					if(client.addUser(buffer, _userSocket[i])) {
-						if (client.GetStatusPasswordClient(_userSocket[i]) == false)
+
+					if(client.addUser(buffer, sd)) {
+						if (client.getStatusPasswordClient(sd) == false)
 						{
-							if (client.userCanExecuteCommand(_password, _userSocket[i], buffer) == false)
-								client.sendToClient(_userSocket[i], "entrer un mot de passe pour executer le serveur\r\n");
+							if (client.userCanExecuteCommand(_password, sd, buffer) == false)
+								client.sendToClient(sd, "entrer un mot de passe pour executer le serveur\r\n");
 						}
-						else
-							client.parsCommands(buffer, _userSocket[i]);
+						else {
+							client.setClientSocket(sd);
+							client.parsCommands(buffer);
+							client.checkAndExecuteCmd();
+
+						}
+						client.printOutput(1, buffer, 0, sd);
 						break;
 					}
-					client.printOutput(1, buffer, 0, _userSocket[i]);
+					client.printOutput(1, buffer, 0, sd);
 				}
 			}
 
