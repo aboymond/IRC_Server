@@ -8,10 +8,8 @@ void Client::parsCommands(string buffer) {
 	ss >> command;
 	std::getline(ss, argument);
 
-	size_t pos = argument.find("\r\n");
-	if (pos != std::string::npos) {
-		argument.erase(pos);
-	}
+	argument.erase(argument.length() - 1);
+	argument.erase(0, 1);
 
 	_cmd[command] = argument;
 
@@ -30,8 +28,9 @@ void   Client::checkAndExecuteCmd() {
 	for (size_t i = 0; i < command.length(); ++i)
 		command[i] = std::toupper(command[i]);
 
-	std::string	cmd[totalOfCmd] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG" };
-	void (Client::*ptr_command[totalOfCmd]) (void) = { &Client::nick, &Client::join, &Client::who, &Client::kick,
+//	std::string	cmd[totalOfCmd] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG" };
+	std::string	cmd[5] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG" };
+	void (Client::*ptr_command[5]) (void) = { &Client::nick, &Client::join, &Client::who, &Client::kick,
 											  &Client::privmsg };
 	for (int i = 0; i < totalOfCmd; i++) {
 		if (cmd[i] == command) {
@@ -43,121 +42,6 @@ void   Client::checkAndExecuteCmd() {
 		sendToClient(getClientSocket(), "Command not found: " + command + "\r\n");
 	_cmd.clear();
 }
-
-
-//	printOutput(1, buffer, 0, socketUser);
-//	if (strncmp(buffer.c_str(), "NICK ", 5) == 0){
-
-//		else
-//			sendToClient(socketUser, "Beaucoup trop long, comme ma b*** !\r\n");
-//	}
-//	else if (strncmp(buffer.c_str(), "WHO ", 4) == 0) {
-//		if (_user[socketUser].getWho() == true) {
-//			map<int, User>::iterator it;
-//			vector<string>::iterator it_channel;
-//			std::string resp_who;
-//			cout << "TEEEEEEEEST in WHOOOOOO" << endl;
-//			for (it = _user.begin(); it != _user.end(); it++) {
-//				User &currentUser = it->second;
-//				if (_whoIsOP[_cmd[JOIN]] == currentUser.getNickName()) {
-//					resp_who = ":" + (string) IP_SERV + " 354 " + _user[socketUser].getNickName() + " 152 #" + _cmd[JOIN] +
-//							" " + currentUser.getNickName() + " :H@\r\n";
-//					sendToClient(socketUser, resp_who);
-//					resp_who.erase();
-//				}
-//				else {
-//					resp_who = ":" + (string) IP_SERV + " 354 " + _user[socketUser].getNickName() + " 152 #" + _cmd[JOIN] +
-//							" " + currentUser.getNickName() + " :H\r\n";
-//					sendToClient(socketUser, resp_who);
-//					resp_who.erase();
-//				}
-//			}
-//			resp_who =  ":" + (string) IP_SERV + " 315 " + _user[socketUser].getNickName() + " #" + _cmd[JOIN] + " :End of /WHO list.\r\n";
-//			sendToClient(socketUser, resp_who);
-//		}
-//		else {
-//			if (_whoIsOP[_cmd[JOIN]] == _user[socketUser].getNickName()) {
-//				std::string response4 =
-//						":" + (string) IP_SERV + " 353 " + _user[socketUser].getNickName() + " = #" + _cmd[JOIN] +
-//							" :@" + _user[socketUser].getNickName() + "\r\n"
-//								  ":" + (string) IP_SERV + " 315 " + _user[socketUser].getNickName() +
-//									" #" + _cmd[JOIN] + " :End of /WHO list.\r\n";
-//				sendToClient(socketUser, response4);
-//			}
-//			else {
-//				std::string response4 =
-//						":" + (string) IP_SERV + " 353 " + _user[socketUser].getNickName() + " = #" + _cmd[JOIN] +
-//							" :@" + _whoIsOP[_cmd[JOIN]] + " " + _user[socketUser].getNickName() + "\r\n"
-//									":" + (string) IP_SERV +" 315 " + _user[socketUser].getNickName() +
-//										" #" + _cmd[JOIN] + " :End of /WHO list.\r\n";
-//				sendToClient(socketUser, response4);
-//			}
-//			_user[socketUser].setWho(true);
-//		}
-//	}
-//	else if (strncmp(buffer.c_str(), "JOIN #", 6) == 0) {
-//
-//		if (buffer.length() < 25){
-//			size_t space = buffer.find(' ');
-//			if (space < 5) {
-//				string channel = buffer.substr(space + 2, buffer.length() - space - 4);
-//				_cmd[JOIN] = channel;
-//				cout << "cmd = " << JOIN << " | channel = " << channel << endl;
-//				join(socketUser);
-//			}
-//		}
-//		else
-//			sendToClient(socketUser, "Beaucoup trop long, comme ma b*** !\r\n");
-//	}
-//	else if (strncmp(buffer.c_str(), "PRIVMSG ", 8) == 0) {
-//
-//			for (std::map<int, User>::iterator it = _user.begin(); it != _user.end(); ++it) {
-//
-//				User currentUser = it->second;
-//				if (currentUser.getSocketUser() != socketUser) {
-//					std::string response =
-//							":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-//							"@localhost " + buffer + "\r\n";
-//
-//					sendToClient(currentUser.getSocketUser(), response);
-//				}
-//			}
-//	}
-//	else if (strncmp(buffer.c_str(), "KICK #", 6) == 0)
-//	{
-////		std::string input = ":USER1!~USER1@localhost KICK #testtest USER1 :USER1";
-//
-//		map<int, User>::iterator it;
-//		vector<string>::iterator it_channel;
-//		string channel = extractChannelName(buffer);
-//		string commandAndChannel = "KICK #" + channel;
-////		cout << commandAndChannel << endl;
-////		string response = ":USER1!~USER1@localhost KICK #testtest USER1 :USER1\r\n";
-//		size_t found = buffer.find_last_of(' ');
-//		string userToKick = buffer.substr(found+1);
-//		string userToKick2 = userToKick.erase(userToKick.length()-2);
-//		string response = ":" + userToKick + "!~" + userToKick + "@localhost " + commandAndChannel + " " + userToKick + " :" + userToKick + "\r\n";
-//		cout << "response = " << response;
-////		cout << "userToKick = " << userToKick << endl;
-//		if (checkChannelExist(channel) == true)
-//		{
-//			for (it = _user.begin(); it != _user.end(); it++)
-//			{
-//				User &currentUser = it->second;
-//				for (it_channel = currentUser.getChannelName().begin(); it_channel < currentUser.getChannelName().end(); ++it_channel) {
-//					if (*it_channel == "testtest") {
-////						cout << "test" << endl;
-//						sendToClient(socketUser, response);
-//					}
-//				}
-//				sendToClient(socketUser, "there is no channel\r\n");
-//			}
-//
-//		}
-//	}
-
-
-
 
 void Client::join(){
 	int clientSocket = getClientSocket();
@@ -263,38 +147,47 @@ void    Client::who() {
 
 void    Client::kick(){
 	int socketUser = getClientSocket();
-	std::map<std::string, std::string>::iterator it_chan = _cmd.begin();
-	std::string channel = it_chan->second;
-
+	map<std::string, std::string>::iterator it_chan = _cmd.begin();
+	map<std::string, std::string>::iterator it_argument = _cmd.begin();
 	map<int, User>::iterator it;
 	vector<string>::iterator it_channel;
-	string commandAndChannel = "KICK " + channel;
 
-	size_t found = channel.find_last_of(' ');
-	string userToKick = channel.substr(found+1);
-	string userToKick2 = userToKick.erase(userToKick.length()-2);
-	string response = ":" + userToKick + "!~" + userToKick + "@localhost " + commandAndChannel + " " + userToKick + " :" + userToKick + "\r\n";
-	cout << "response = " << response;
+	string channel = extractChannelName(it_chan->second);
+	cout << "channel = " << channel << endl;
+	string userToKick = it_argument->second;
+	string commandAndChannel = "KICK " + channel;
+	size_t found = userToKick.find_last_of(' ');
+	string user = it_argument->second.substr(found + 1, it_argument->second.length() - found);
+
+	string response = ":" + user + "!~" + user + "@localhost " + commandAndChannel + " " + user + " :" + user + "\r\n";
+//	sendToClient(socketUser, response);
 	if (checkChannelExist(channel) == true)
 	{
 		for (it = _user.begin(); it != _user.end(); it++)
 		{
 			User &currentUser = it->second;
 			for (it_channel = currentUser.getChannelName().begin(); it_channel < currentUser.getChannelName().end(); ++it_channel) {
-				if (*it_channel == "testtest") {
-					sendToClient(socketUser, response);
+				if (*it_channel == channel) {
+					if (currentUser.getNickName() == user) {
+						sendToClient(socketUser, response);
+					}
+					else
+						sendToClient(socketUser, ":" + (string)IP_SERV + " 401 " + _user[socketUser].getNickName() + " " + user + " :No such Nick\r\n" );
 				}
+				else
+					sendToClient(socketUser, "Channel doesn't exist\r\n");
 			}
-			sendToClient(socketUser, "There is no channel\r\n");
 		}
 	}
+	else
+		sendToClient(socketUser, "Channel doesn't exist\r\n");
+
 	_cmd.clear();
 }
 
 void    Client::privmsg(){
 	int socketUser = getClientSocket();
 	std::map<std::string, std::string>::iterator it_chan = _cmd.begin();
-	std::string command = it_chan->first;
 	std::string msg = it_chan->second;
 	cout << "MSG = " << msg << endl;
 
@@ -304,7 +197,7 @@ void    Client::privmsg(){
 		if (currentUser.getSocketUser() != socketUser) {
 			std::string response =
 					":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-					"@localhost "+ command + msg + "\r\n";
+					"@localhost "+ "PRIVMSG " + msg + "\r\n";
 
 			sendToClient(currentUser.getSocketUser(), response);
 		}

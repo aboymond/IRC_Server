@@ -97,7 +97,9 @@ vector<string>	User::getChannelName() const{
 
 bool User::searchChannel(std::string channelName) const {
 	for (std::vector<std::string>::const_iterator it = _channelName.begin(); it != _channelName.end(); ++it){
+		cout << "it = " << *it << endl;
 		if (it->compare(channelName) == 0){
+			cout << "true" << endl;
 			return true;
 		}
 	}

@@ -121,8 +121,13 @@ void Server::waitToNewConnection() {
 					_userSocket.erase(_userSocket.begin() + (int)i);
 				} else {
 					buffer[val_read] = '\0';
-
-
+					client.printOutput(1, buffer, 0, sd);
+					if (strncmp(buffer, "QUIT ", 5) == 0)
+					{
+						_userSocket.erase(_userSocket.begin()+(int)i);
+						client.eraseUser(sd);
+						close(sd);
+					}
 					if(client.addUser(buffer, sd)) {
 						if (client.getStatusPasswordClient(sd) == false)
 						{
@@ -135,10 +140,9 @@ void Server::waitToNewConnection() {
 							client.checkAndExecuteCmd();
 
 						}
-						client.printOutput(1, buffer, 0, sd);
 						break;
 					}
-					client.printOutput(1, buffer, 0, sd);
+//					client.printOutput(1, buffer, 0, sd);
 				}
 			}
 
