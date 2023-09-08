@@ -107,7 +107,7 @@ bool Client::getStatusPasswordClient(int socketUser) {
 string Client::extractChannelName(string buffer) {
 
 	size_t found = buffer.find('#');
-	found += 1;
+//	found += 1;
 
 	string channel = buffer.substr(found, buffer.find(' ', found) - found);
 	return (channel);

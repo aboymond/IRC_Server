@@ -63,4 +63,6 @@ public:
     bool   initUserAndNick(std::string buffer);
 };
 
+std::ostream &operator<<(std::ostream &o, User const &i);
+
 #endif

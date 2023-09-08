@@ -48,6 +48,7 @@ public:
 	void kick();
 	void pass();
 	void privmsg();
+	void part();
 
 	//CHANNEL
 	string extractChannelName(string buffer);

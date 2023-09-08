@@ -97,7 +97,9 @@ vector<string>	User::getChannelName() const{
 
 bool User::searchChannel(std::string channelName) const {
 	for (std::vector<std::string>::const_iterator it = _channelName.begin(); it != _channelName.end(); ++it){
+		cout << "it = " << *it << endl;
 		if (it->compare(channelName) == 0){
+			cout << "true" << endl;
 			return true;
 		}
 	}
@@ -139,4 +141,10 @@ bool    User::initUserAndNick(string buffer){
 	if (nickName.empty())
 		return (false);
 	return (true);
+}
+
+std::ostream &operator<<(std::ostream &o, User const &i) {
+	o << "Username " << i.getUserName() << "\n"
+		 "Moderator = : " << i.getOperator() << "\n" << endl;
+	return (o);
 }
