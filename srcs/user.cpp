@@ -143,8 +143,16 @@ bool    User::initUserAndNick(string buffer){
 	return (true);
 }
 
+void 		User::delChannelName(std::string channel) {
+	for (vector<std::string>::iterator it = _channelName.begin(); it != _channelName.end(); it++) {
+		if (*it == channel)
+			_channelName.erase(it);
+	}
+}
+
 std::ostream &operator<<(std::ostream &o, User const &i) {
 	o << "Username " << i.getUserName() << "\n"
 		 "Moderator = : " << i.getOperator() << "\n" << endl;
 	return (o);
 }
+

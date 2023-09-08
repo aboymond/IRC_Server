@@ -46,7 +46,6 @@ public:
 	void 				setPasswordIsValid( bool passWordIsValid );
 	void 				setWho(bool who);
 
-
 	// GET
 	const std::string	&getNickName() const;
 	const std::string	&getUserName() const;
@@ -58,9 +57,11 @@ public:
 	bool 				getPasswordIsValid() const;
 	bool 				getWho() const;
 
-
     // Init nick n username
-    bool   initUserAndNick(std::string buffer);
+    bool   				initUserAndNick(std::string buffer);
+
+	void 				delChannelName(std::string channel);
+
 };
 
 std::ostream &operator<<(std::ostream &o, User const &i);
