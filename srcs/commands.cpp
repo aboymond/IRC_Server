@@ -29,9 +29,8 @@ void   Client::checkAndExecuteCmd() {
 		command[i] = std::toupper(command[i]);
 
 //	std::string	cmd[totalOfCmd] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG" };
-	std::string	cmd[5] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG" };
-	void (Client::*ptr_command[5]) (void) = { &Client::nick, &Client::join, &Client::who, &Client::kick,
-											  &Client::privmsg };
+	std::string	cmd[6] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PART"};
+	void (Client::*ptr_command[6]) (void) = { &Client::nick, &Client::join, &Client::who, &Client::kick, &Client::privmsg, &Client::part };
 	for (int i = 0; i < totalOfCmd; i++) {
 		if (cmd[i] == command) {
 			(this->*ptr_command[i])();
@@ -161,27 +160,54 @@ void    Client::kick(){
 
 	string response = ":" + user + "!~" + user + "@localhost " + commandAndChannel + " " + user + " :" + user + "\r\n";
 //	sendToClient(socketUser, response);
-	if (checkChannelExist(channel) == true)
+	if (_user[socketUser].getOperator() == true)
 	{
-		for (it = _user.begin(); it != _user.end(); it++)
+		if (checkChannelExist(channel) == true)
 		{
-			User &currentUser = it->second;
-			for (it_channel = currentUser.getChannelName().begin(); it_channel < currentUser.getChannelName().end(); ++it_channel) {
-				if (*it_channel == channel) {
-					if (currentUser.getNickName() == user) {
-						sendToClient(socketUser, response);
+			for (it = _user.begin(); it != _user.end(); it++)
+			{
+				User &currentUser = it->second;
+				for (it_channel = currentUser.getChannelName().begin(); it_channel < currentUser.getChannelName().end(); ++it_channel) {
+					if (*it_channel == channel) {
+						if (currentUser.getNickName() != user) {
+							sendToClient(socketUser, response);
+						}
+						else
+							sendToClient(socketUser, ":" + (string)IP_SERV + " 401 " + _user[socketUser].getNickName() + " " + user + " :No such Nick\r\n" );
 					}
 					else
-						sendToClient(socketUser, ":" + (string)IP_SERV + " 401 " + _user[socketUser].getNickName() + " " + user + " :No such Nick\r\n" );
+						sendToClient(socketUser, "Channel doesn't exist\r\n");
 				}
-				else
-					sendToClient(socketUser, "Channel doesn't exist\r\n");
 			}
 		}
+		else
+			sendToClient(socketUser, "Channel doesn't exist\r\n");
 	}
-	else
-		sendToClient(socketUser, "Channel doesn't exist\r\n");
+	_cmd.clear();
+}
 
+void    Client::part(){
+	int socketUser = getClientSocket();
+//	map<std::string, std::string>::iterator it_chan = _cmd.begin();
+	map<std::string, std::string>::iterator it_argument = _cmd.begin();
+	map<int, User>::iterator it;
+	vector<string>::iterator it_channel;
+
+//	string channel = extractChannelName(it_chan->second);
+//	cout << "channel = " << channel << endl;
+	string channelToleave = it_argument->second;
+	string commandAndChannel = "PART " + channelToleave;
+	cout << "channelToLeave = " << channelToleave << endl;
+	string user = _user[socketUser].getUserName();
+
+	string response = ":" + user + "!~" + user + "@localhost " + commandAndChannel + " " + user + " :" + user + "\r\n";
+//	sendToClient(socketUser, response);
+		if (checkChannelExist(channelToleave) == true)
+		{
+//			_user[socketUser]
+		}
+		else
+			sendToClient(socketUser, "Channel doesn't exist\r\n");
 	_cmd.clear();
 }
 

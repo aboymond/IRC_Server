@@ -142,3 +142,9 @@ bool    User::initUserAndNick(string buffer){
 		return (false);
 	return (true);
 }
+
+std::ostream &operator<<(std::ostream &o, User const &i) {
+	o << "Username " << i.getUserName() << "\n"
+		 "Moderator = : " << i.getOperator() << "\n" << endl;
+	return (o);
+}
