@@ -26,7 +26,7 @@ protected:
 
 	bool 							_who;
 
-	bool		_PasswordIsValid;
+	bool							_PasswordIsValid;
 
 
 public:

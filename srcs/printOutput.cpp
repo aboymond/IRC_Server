@@ -1,5 +1,4 @@
 #include "../headers/server.hpp"
-#include "../headers/client.hpp"
 
 void Server::serverPrintOutput(int port, int socketserver) {
 	// Send in send.cpp = 1

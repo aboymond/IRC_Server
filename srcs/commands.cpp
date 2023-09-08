@@ -13,13 +13,13 @@ void Client::parsCommands(string buffer) {
 
 	_cmd[command] = argument;
 
+
 	std::map<std::string, std::string>::iterator it = _cmd.find(command);
 	if (it != _cmd.end())
 		cout << "COMMAND = " << it->first << " | ARGUMENT = " << it->second << endl;
 }
 
 void   Client::checkAndExecuteCmd() {
-	int totalOfCmd = 5;
 	bool commandFound = false;
 	std::string command;
 	std::map<std::string, std::string>::iterator it = _cmd.begin();
@@ -28,10 +28,12 @@ void   Client::checkAndExecuteCmd() {
 	for (size_t i = 0; i < command.length(); ++i)
 		command[i] = std::toupper(command[i]);
 
-//	std::string	cmd[totalOfCmd] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG" };
-	std::string	cmd[6] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PART"};
-	void (Client::*ptr_command[6]) (void) = { &Client::nick, &Client::join, &Client::who, &Client::kick, &Client::privmsg, &Client::part };
-	for (int i = 0; i < totalOfCmd; i++) {
+
+	std::string	cmd[NBR_OF_CMD] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PASS", "PART" };
+	void (Client::*ptr_command[NBR_OF_CMD]) (void) = { &Client::nick, &Client::join, &Client::who, &Client::kick,
+											  &Client::privmsg, &Client::pass, &Client::part };
+	for (int i = 0; i < NBR_OF_CMD; i++) {
+
 		if (cmd[i] == command) {
 			(this->*ptr_command[i])();
 			commandFound = true;
@@ -45,7 +47,6 @@ void   Client::checkAndExecuteCmd() {
 void Client::join(){
 	int clientSocket = getClientSocket();
 	std::map<std::string, std::string>::iterator it = _cmd.begin();
-	std::string command = it->first;
 	std::string channel = it->second;
 
 	if (_user.find(clientSocket) != _user.end()){
@@ -76,8 +77,6 @@ void Client::nick(){
 
 	if (nickname.length() < 8) {
 		if (_user.find(socketUser) != _user.end()){
-			std::map<string, string>::iterator it;
-			it = _cmd.begin();
 			User checkUser = _user[socketUser];
 			checkUser.setNickName(nickname);
 			string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
@@ -101,7 +100,6 @@ void    Client::who() {
 
 	if (_user[socketUser].getWho() == true) {
 	map<int, User>::iterator it;
-	vector<string>::iterator it_channel;
 	std::string resp_who;
 
 	for (it = _user.begin(); it != _user.end(); it++) {
@@ -223,10 +221,32 @@ void    Client::privmsg(){
 		if (currentUser.getSocketUser() != socketUser) {
 			std::string response =
 					":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-					"@localhost "+ "PRIVMSG " + msg + "\r\n";
+					"@localhost " + "PRIVMSG " + msg + "\r\n";
+
 
 			sendToClient(currentUser.getSocketUser(), response);
 		}
+	}
+	_cmd.clear();
+}
+
+void Client::pass(){
+
+	std::map<std::string, std::string>::iterator it = _cmd.begin();
+	std::string command = it->first;
+	std::string password = it->second;
+
+	for (size_t i = 0; i < command.length(); ++i)
+		command[i] = std::toupper(command[i]);
+
+	cout << "in pass command = " << command << " | password = " << password << " | getPass = " << getServerPassword() << endl;
+	if (password == getServerPassword()) {
+		sendToClient(getClientSocket(), "WELCOME TO THE SERVER\r\n");
+		_user[getClientSocket()].setPasswordIsValid(true);
+	}
+	else {
+		sendToClient(getClientSocket(), "Error bad password: " + password + "\r\n");
+		sendToClient(getClientSocket(), "Enter the password with /PASS\r\n");
 	}
 	_cmd.clear();
 }

@@ -1,8 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#define NICK    "NICK"
-#define JOIN    "JOIN"
+#define NBR_OF_CMD 6
 
 #include "user.hpp"
 #include "server.hpp"
@@ -23,6 +22,7 @@ private:
 	string  _command;
 	string  _options;
 	string  _currentOP;
+	string 	_serverPassword;
 	int     _clientSocket;
 	map <int, User>         _user;
 	map <string, string>    _cmd;
@@ -46,6 +46,7 @@ public:
 	void join();
 	void who();
 	void kick();
+	void pass();
 	void privmsg();
 	void part();
 
@@ -60,10 +61,13 @@ public:
 	const User& getUser(int usersocket) const;
 	vector<User> getUserVector() const;
 	bool getStatusPasswordClient(int socketUser);
-	int getClientSocket();
+	int getClientSocket() const;
+	std::string getServerPassword() const;
+	bool passwordVerifier(int socketUser);
 
 	//SET
 	void setClientSocket(int clientSocket);
+	void setServerPassword(std::string password);
 
 	//TOOLS
 	void sendToClient(int fd, std::string message);

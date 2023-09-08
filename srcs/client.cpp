@@ -1,5 +1,4 @@
 #include "../headers/client.hpp"
-#include "../headers/server.hpp"
 
 Client::Client(){};
 
@@ -32,12 +31,20 @@ void Client::setWhoIsOP(std::string channel, std::string nickname) {
 	_whoIsOP.insert(std::make_pair(channel, nickname));
 }
 
+void Client::setServerPassword(std::string password) {
+	_serverPassword = password;
+}
+
 void Client::setClientSocket(int clientSocket) {
 	_clientSocket = clientSocket;
 }
 
-int Client::getClientSocket() {
+int Client::getClientSocket() const{
 	return(_clientSocket);
+}
+
+std::string Client::getServerPassword() const {
+	return(_serverPassword);
 }
 
 std::string Client::getWhoIsOP_Nick(std::string channel) {
@@ -104,4 +111,13 @@ string Client::extractChannelName(string buffer) {
 
 	string channel = buffer.substr(found, buffer.find(' ', found) - found);
 	return (channel);
+}
+
+bool Client::passwordVerifier(int socketUser) {
+
+	if (getStatusPasswordClient(socketUser) == false) {
+		return (false);
+	}
+	else
+		return (true);
 }

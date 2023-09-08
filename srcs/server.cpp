@@ -1,15 +1,16 @@
 #include "../headers/server.hpp"
 
 Server::Server() :
-		_socketServer(0),
-		_port(0),
-		_password("Default"),
-		_validPassword(false) {
+	_socketServer(0),
+	_port(0),
+	_password("Default"),
+	_validPassword(false) {
 
 };
 
-Server::Server(int port, string password) : _port(port), _password(password), _validPassword(false) {
+Server::Server(int port, string password) : _port(port), _validPassword(false) {
 	_socketServer = socket(AF_INET, SOCK_STREAM, 0);
+	setPassword(password);
 	if (_socketServer < 0)
 		cout << "Error socket server" << endl;
 	int optionFlag = 1;
@@ -35,6 +36,10 @@ Server &Server::operator=(const Server &rhs) {
 	return (*this);
 }
 
+void Server::setPassword(std::string password) {
+	_password = password;
+}
+
 int Server::getPort() const {
 	return (this->_port);
 }
@@ -54,6 +59,8 @@ bool Server::getValidPassword() const {
 const vector<int>& Server::getUserSockets() const {
 	return _userSocket;
 }
+
+
 
 //const Client* Server::getClient() const {
 //	return _client;
@@ -75,7 +82,6 @@ void Server::createSocketServer() {
 void Server::waitToNewConnection() {
 
 	int max_fd = _socketServer;
-	string tabCommand[] = {"NICK ", "JOIN "};
 	socklen_t addrlen = sizeof(_serverAddress);
 	fd_set readfds;
 	Client client;
@@ -105,6 +111,7 @@ void Server::waitToNewConnection() {
 
 			fcntl(tmp_user_socket, F_SETFL, O_NONBLOCK);
 			_userSocket.push_back(tmp_user_socket);
+			client.sendToClient(tmp_user_socket, "Enter the password with /PASS\r\n");
 		}
 
 		for (size_t i = 0; i < _userSocket.size(); i++) {
@@ -114,13 +121,12 @@ void Server::waitToNewConnection() {
 			if (FD_ISSET(sd, &readfds)) {
 				size_t val_read;
 				if ((val_read = recv(sd, buffer, 1024, 0)) == 0) {
-					//client.eraseUser(sd);
-					//client.printOutput(3, NULL, 0, sd);
 					client.eraseUser(sd);
 					close(sd);
 					_userSocket.erase(_userSocket.begin() + (int)i);
 				} else {
 					buffer[val_read] = '\0';
+
 					client.printOutput(1, buffer, 0, sd);
 					if (strncmp(buffer, "QUIT ", 5) == 0)
 					{
@@ -129,10 +135,12 @@ void Server::waitToNewConnection() {
 						close(sd);
 					}
 					if(client.addUser(buffer, sd)) {
-						if (client.getStatusPasswordClient(sd) == false)
+						if (client.passwordVerifier(sd) == false)
 						{
-							if (client.userCanExecuteCommand(_password, sd, buffer) == false)
-								client.sendToClient(sd, "entrer un mot de passe pour executer le serveur\r\n");
+							client.setServerPassword(_password);
+							client.setClientSocket(sd);
+							client.parsCommands(buffer);
+							client.pass();
 						}
 						else {
 							client.setClientSocket(sd);
@@ -140,9 +148,8 @@ void Server::waitToNewConnection() {
 							client.checkAndExecuteCmd();
 
 						}
-						break;
 					}
-//					client.printOutput(1, buffer, 0, sd);
+
 				}
 			}
 

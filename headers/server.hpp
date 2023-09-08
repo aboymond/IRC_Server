@@ -49,46 +49,32 @@ private:
 	bool _validPassword;
 	vector<int> _userSocket;
 	struct sockaddr_in _serverAddress;
-	//std::vector<pollfd>		_pfds;
 	Client				*_client;
-	//User				*_user;
+
 
 public:
 
 	Server();
-
 	Server(Server const &src);
-
 	Server(int port, string password);
-
 	Server &operator=(Server const &rhs);
-
 	~Server();
+//SET
+	void setPassword(std::string password);
 
 // GET
 	int getPort() const;
-
 	int getSocketServer() const;
-
 	string getPassword() const;
-
 	bool getValidPassword() const;
-
 	const vector<int>& getUserSockets() const;
 
-//	const Client* getClient() const;
-
-	void createSocketServer();
-
 //SERV
+	void createSocketServer();
 	void waitToNewConnection();
-
-//SEND
-//	void sendToClient(int fd, std::string message);
 
 //PRINT OUTPUT
 	void serverPrintOutput(int port, int socketserver);
-
 
 
 	class BadArgument : public exception {
