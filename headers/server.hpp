@@ -59,6 +59,8 @@ public:
 	Server(int port, string password);
 	Server &operator=(Server const &rhs);
 	~Server();
+//SET
+	void setPassword(std::string password);
 
 // GET
 	int getPort() const;
@@ -66,20 +68,13 @@ public:
 	string getPassword() const;
 	bool getValidPassword() const;
 	const vector<int>& getUserSockets() const;
-//	bool getPasswordIsValid() const;
-
-//PASS
-	bool passwordVerifier(int socketUser);
-
 
 //SERV
 	void createSocketServer();
 	void waitToNewConnection();
 
-
 //PRINT OUTPUT
 	void serverPrintOutput(int port, int socketserver);
-
 
 
 	class BadArgument : public exception {

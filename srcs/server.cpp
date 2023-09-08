@@ -8,8 +8,9 @@ Server::Server() :
 
 };
 
-Server::Server(int port, string password) : _port(port), _password(password), _validPassword(false) {
+Server::Server(int port, string password) : _port(port), _validPassword(false) {
 	_socketServer = socket(AF_INET, SOCK_STREAM, 0);
+	setPassword(password);
 	if (_socketServer < 0)
 		cout << "Error socket server" << endl;
 	int optionFlag = 1;
@@ -35,6 +36,10 @@ Server &Server::operator=(const Server &rhs) {
 	return (*this);
 }
 
+void Server::setPassword(std::string password) {
+	_password = password;
+}
+
 int Server::getPort() const {
 	return (this->_port);
 }
@@ -54,6 +59,8 @@ bool Server::getValidPassword() const {
 const vector<int>& Server::getUserSockets() const {
 	return _userSocket;
 }
+
+
 
 //const Client* Server::getClient() const {
 //	return _client;
@@ -104,6 +111,7 @@ void Server::waitToNewConnection() {
 
 			fcntl(tmp_user_socket, F_SETFL, O_NONBLOCK);
 			_userSocket.push_back(tmp_user_socket);
+			client.sendToClient(tmp_user_socket, "Enter the password with /PASS\r\n");
 		}
 
 		for (size_t i = 0; i < _userSocket.size(); i++) {
@@ -119,16 +127,20 @@ void Server::waitToNewConnection() {
 				} else {
 					buffer[val_read] = '\0';
 
-
+					client.printOutput(1, buffer, 0, sd);
+					if (strncmp(buffer, "QUIT ", 5) == 0)
+					{
+						_userSocket.erase(_userSocket.begin()+(int)i);
+						client.eraseUser(sd);
+						close(sd);
+					}
 					if(client.addUser(buffer, sd)) {
-						if (passwordVerifier(sd) == false)
+						if (client.passwordVerifier(sd) == false)
 						{
-							client.sendToClient(sd, "Enter the password with /PASS\r\n");
+							client.setServerPassword(_password);
 							client.setClientSocket(sd);
 							client.parsCommands(buffer);
-							client.checkAndExecuteCmd();
-//							if (client.userCanExecuteCommand(_password, sd, buffer) == false)
-//								client.sendToClient(sd, "entrer un mot de passe pour executer le serveur\r\n");
+							client.pass();
 						}
 						else {
 							client.setClientSocket(sd);
@@ -136,10 +148,7 @@ void Server::waitToNewConnection() {
 							client.checkAndExecuteCmd();
 
 						}
-						client.printOutput(1, buffer, 0, sd);
-						break;
 					}
-					client.printOutput(1, buffer, 0, sd);
 				}
 			}
 
@@ -166,14 +175,4 @@ std::ostream &operator<<(std::ostream &o, Server const &i) {
 	  << i.getPassword() << "\n"
 	                        "Password status: " << i.getValidPassword() << "\n";
 	return (o);
-}
-
-bool Server::passwordVerifier(int socketUser) {
-	(void)socketUser;
-	if (getValidPassword() == false) {
-
-		return (false);
-	}
-	else
-		return (true);
 }

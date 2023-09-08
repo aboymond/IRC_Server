@@ -193,9 +193,22 @@ void    Client::privmsg(){
 }
 
 void Client::pass(){
+
 	std::map<std::string, std::string>::iterator it = _cmd.begin();
 	std::string command = it->first;
 	std::string password = it->second;
-	cout << "in pass command = " << command << " | password = " << password << endl;
 
+	for (size_t i = 0; i < command.length(); ++i)
+		command[i] = std::toupper(command[i]);
+
+	cout << "in pass command = " << command << " | password = " << password << " | getPass = " << getServerPassword() << endl;
+	if (password == getServerPassword()) {
+		sendToClient(getClientSocket(), "WELCOME TO THE SERVER\r\n");
+		_user[getClientSocket()].setPasswordIsValid(true);
+	}
+	else {
+		sendToClient(getClientSocket(), "Error bad password: " + password + "\r\n");
+		sendToClient(getClientSocket(), "Enter the password with /PASS\r\n");
+	}
+	_cmd.clear();
 }
