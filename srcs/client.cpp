@@ -19,23 +19,6 @@ Client &Client::operator=(const Client &rhs) {
 
 Client::~Client() {};
 
-//const User& Client::getUser(int usersocket) const {
-//	for (size_t i = 0; i < _user.size(); i++) {
-//		const User &checkUser = _user[i];
-//		cout << "usersocket = " << usersocket << "_user = " << checkUser.getSocketUser() << endl;
-//		if (checkUser.getSocketUser() == usersocket) {
-//			return (_user[i]);
-//		}
-//	}
-//	//return (_user[i]);
-//
-//	throw std::runtime_error("User not found");
-//
-//}
-
-//vector <User> Client::getUserVector() const {
-//	return (this->_user);
-//}
 
 string Client::getCommand() const {
 	return (this->_command);
@@ -45,8 +28,16 @@ string Client::getOptions() const {
 	return (this->_options);
 }
 
-void 		Client::setWhoIsOP(std::string channel, std::string nickname) {
+void Client::setWhoIsOP(std::string channel, std::string nickname) {
 	_whoIsOP.insert(std::make_pair(channel, nickname));
+}
+
+void Client::setClientSocket(int clientSocket) {
+	_clientSocket = clientSocket;
+}
+
+int Client::getClientSocket() {
+	return(_clientSocket);
 }
 
 std::string Client::getWhoIsOP_Nick(std::string channel) {
@@ -102,6 +93,15 @@ bool Client::checkChannelExist(std::string channelName) {
 	return false;
 }
 
-bool Client::GetStatusPasswordClient(int socketUser) {
+bool Client::getStatusPasswordClient(int socketUser) {
 	return (_user[socketUser].getPasswordIsValid());
+}
+
+string Client::extractChannelName(string buffer) {
+
+	size_t found = buffer.find('#');
+//	found += 1;
+
+	string channel = buffer.substr(found, buffer.find(' ', found) - found);
+	return (channel);
 }
