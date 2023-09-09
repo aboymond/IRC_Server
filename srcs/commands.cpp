@@ -190,19 +190,24 @@ void    Client::part(){
 	map<std::string, std::string>::iterator it_argument = _cmd.begin();
 	map<int, User>::iterator it;
 	vector<string>::iterator it_channel;
+	size_t 					space;
 
 //	string channel = extractChannelName(it_chan->second);
 //	cout << "channel = " << channel << endl;
 	string channelToleave = it_argument->second;
+	space = channelToleave.find(' ');
 	string commandAndChannel = "PART " + channelToleave;
 	cout << "channelToLeave = " << channelToleave << endl;
 	string user = _user[socketUser].getUserName();
+	string channel = channelToleave.substr(0, space);
 
-	string response = ":" + user + "!~" + user + "@localhost " + commandAndChannel + " " + user + " :" + user + "\r\n";
-//	sendToClient(socketUser, response);
-		if (checkChannelExist(channelToleave) == true)
+
+	string response = ":" + user + "!~" + user + "@localhost" + " PART " + channel + " :\"Leaving\"\r\n";
+	cout << "response = " << response << endl;
+	//:quentin!~quentin@freenode-lju.k75.6hdat0.IP PART #testtest :"Leaving"
+		if (checkChannelExist(channel) == true)
 		{
-//			_user[socketUser]
+			sendToClient(socketUser, response);
 		}
 		else
 			sendToClient(socketUser, "Channel doesn't exist\r\n");
