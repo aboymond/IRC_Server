@@ -49,6 +49,7 @@ public:
 	void pass();
 	void privmsg();
 	void part();
+	void quit();
 
 	//CHANNEL
 	string extractChannelName(string buffer);
