@@ -143,6 +143,35 @@ bool    User::initUserAndNick(string buffer){
 	return (true);
 }
 
+void User::printAllChannel() {
+	for (std::vector<std::string>::const_iterator it = _channelName.begin(); it != _channelName.end(); ++it){
+		cout << "Is on channel : " << *it << endl;
+	}
+}
+
+bool         User::getIsOperator(std::string channel) {
+	bool tmp_isOP = false;
+	if(_isOperator.find(channel) != _isOperator.end()){
+		tmp_isOP = _isOperator[channel];
+	}
+	return (tmp_isOP);
+}
+
+void         User::setIsOperator(std::string channel, bool isOperator){
+	_isOperator.insert(std::make_pair(channel, isOperator));
+}
+
+void 		User::delChannelName(std::string channel) {
+	for (vector<std::string>::iterator it = _channelName.begin(); it != _channelName.end(); it++) {
+		cout << "it = " << *it << endl;
+		if (*it == channel)
+		{
+			_channelName.erase(it);
+			break ;
+		}
+	}
+}
+
 std::ostream &operator<<(std::ostream &o, User const &i) {
 	o << "Username " << i.getUserName() << "\n"
 		 "Moderator = : " << i.getOperator() << "\n" << endl;
