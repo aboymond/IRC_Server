@@ -29,9 +29,9 @@ void   Client::checkAndExecuteCmd() {
 		command[i] = std::toupper(command[i]);
 
 
-	std::string	cmd[NBR_OF_CMD] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PASS", "PART" };
+	std::string	cmd[NBR_OF_CMD] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PASS", "PART", "TOPIC" };
 	void (Client::*ptr_command[NBR_OF_CMD]) (void) = { &Client::nick, &Client::join, &Client::who, &Client::kick,
-											  &Client::privmsg, &Client::pass, &Client::part };
+											  &Client::privmsg, &Client::pass, &Client::part, &Client::topic };
 	for (int i = 0; i < NBR_OF_CMD; i++) {
 
 		if (cmd[i] == command) {
@@ -66,6 +66,7 @@ void Client::join(){
 			_user[clientSocket].setIsOperator(channel, false);
 			_user[clientSocket].setWho(false);
 		}
+
 		for (std::map<int, User>::iterator it = _user.begin(); it != _user.end(); ++it) {
 			User currentUser = it->second;
 			string response = ":" + _user[clientSocket].getNickName() + "!~" + _user[clientSocket].getUserName() +
@@ -166,7 +167,6 @@ void    Client::kick(){
 	vector<string>::iterator it_channel;
 
 	string channel = extractChannelName(it_chan->second);
-	cout << "channel = " << channel << endl;
 	string userToKick = it_argument->second;
 	string commandAndChannel = "KICK " + channel;
 	size_t found = userToKick.find_last_of(' ');
@@ -206,22 +206,66 @@ void    Client::part(){
 	map<std::string, std::string>::iterator it_argument = _cmd.begin();
 	map<int, User>::iterator it;
 	vector<string>::iterator it_channel;
+	size_t 					space;
 
 //	string channel = extractChannelName(it_chan->second);
 //	cout << "channel = " << channel << endl;
 	string channelToleave = it_argument->second;
+	space = channelToleave.find(' ');
 	string commandAndChannel = "PART " + channelToleave;
 	cout << "channelToLeave = " << channelToleave << endl;
 	string user = _user[socketUser].getUserName();
+	string channel = channelToleave.substr(0, space);
 
-	string response = ":" + user + "!~" + user + "@localhost " + commandAndChannel + " " + user + " :" + user + "\r\n";
-//	sendToClient(socketUser, response);
-		if (checkChannelExist(channelToleave) == true)
+//	cout << "response = " << response << endl;
+	string response = ":" + user + "!~" + user + "@localhost" + " PART " + channel + " :\"Leaving\"\r\n";
+//	:USER2!~USER2@freenode-o6d.g28.dc9e5h.IP PART #test43 :"Leaving"
+		if (checkChannelExist(channel) == true)
 		{
-//			_user[socketUser]
+			for (map<int, User>::iterator it = _user.begin(); it != _user.end() ; ++it) {
+				cout << "username = " << it->second.getUserName() << endl;
+				User currentUser = it->second;
+				if (currentUser.getSocketUser() != socketUser)
+				{
+					string response2 = ":" + _user[socketUser].getUserName() + "!~" + "@localhost" + " PART " + channel + " :\"Leaving\"\r\n";
+					sendToClient(currentUser.getSocketUser(), response2);
+				}
+			}
+			sendToClient(socketUser, response);
+			_user[socketUser].delChannelName(channel);
 		}
 		else
 			sendToClient(socketUser, "Channel doesn't exist\r\n");
+
+	_user[socketUser].printAllChannel();
+	_cmd.clear();
+}
+
+void    Client::topic(){
+	int socketUser = getClientSocket();
+	map<std::string, std::string>::iterator it_argument = _cmd.begin();
+	string argument = it_argument->second;
+	string user = _user[socketUser].getUserName();
+	string channel = argument.substr(0, argument.find(' '));
+	string nameOfChannelTopic = argument.substr(argument.find(':'), argument.length());
+//	:*.freenode.net 482 USER2 #test42 :You do not have access to change the topic on this channel
+	string responseIfchannelNotExiste = ":*.@localhost 403 " + user + " " + nameOfChannelTopic + " :No such channel\r\n";
+	string responseIfChannelCanHaveTop = ":" + user + "!~" + user + "@localhost" + " TOPIC " + argument + "\r\n";
+	string responseIfUserHaveNoPermission = ":*.localhost 482 " + user + " " + channel + " :You do not have access to change the topic on this channel\r\n";
+	if (checkChannelExist(channel) == true)
+	{
+		if (_user[socketUser].getOperator() == true)
+		{
+			sendToClient(socketUser, responseIfChannelCanHaveTop);
+
+		}
+		else
+		{
+			sendToClient(socketUser, responseIfUserHaveNoPermission);
+		}
+	}
+	else
+		sendToClient(socketUser, responseIfchannelNotExiste);
 	_cmd.clear();
 }
 

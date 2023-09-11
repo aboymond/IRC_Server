@@ -1,7 +1,8 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#define NBR_OF_CMD 7
+
+#define NBR_OF_CMD 8
 
 #include "user.hpp"
 #include "server.hpp"
@@ -49,7 +50,9 @@ public:
 	void pass();
 	void privmsg();
 	void part();
+	void topic();
 	void quit();
+
 
 	//CHANNEL
 	string extractChannelName(string buffer);
