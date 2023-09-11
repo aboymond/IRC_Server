@@ -121,3 +121,4 @@ bool Client::passwordVerifier(int socketUser) {
 	else
 		return (true);
 }
+

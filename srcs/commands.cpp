@@ -52,13 +52,19 @@ void Client::join(){
 	if (_user.find(clientSocket) != _user.end()){
 		std::map<string, string>::iterator it;
 		it = _cmd.begin();
-		User checkUser = _user[clientSocket];
 		if (checkChannelExist(it->second) != true){
 
 			_user[clientSocket].setChannelName(channel);
 			_user[clientSocket].setOperator(true);
+			_user[clientSocket].setIsOperator(channel, true);
 			setWhoIsOP(channel, _user[clientSocket].getNickName());
+			_user[clientSocket].setWho(false);
 			cout << _user[clientSocket].getNickName() << " is operator !" << endl;
+		}
+		else {
+			_user[clientSocket].setChannelName(channel);
+			_user[clientSocket].setIsOperator(channel, false);
+			_user[clientSocket].setWho(false);
 		}
 		for (std::map<int, User>::iterator it = _user.begin(); it != _user.end(); ++it) {
 			User currentUser = it->second;
@@ -67,6 +73,7 @@ void Client::join(){
 			sendToClient(currentUser.getSocketUser(), response);
 		}
 	}
+	_user[clientSocket].printAllChannel();
 	_cmd.clear();
 }
 
@@ -97,50 +104,59 @@ void    Client::who() {
 	int socketUser = getClientSocket();
 	std::map<std::string, std::string>::iterator it = _cmd.begin();
 	std::string channel = it->second;
+	std::string resp_who;
+	std::string op;
 
 	if (_user[socketUser].getWho() == true) {
-	map<int, User>::iterator it;
-	std::string resp_who;
+		map<int, User>::iterator it;
 
-	for (it = _user.begin(); it != _user.end(); it++) {
-		User &currentUser = it->second;
-		if (_whoIsOP[channel] == currentUser.getNickName()) {
-			resp_who = ":" + (string) IP_SERV + " 354 " + _user[socketUser].getNickName() + " 152 " + channel +
-					" " + currentUser.getNickName() + " :H@\r\n";
-			sendToClient(socketUser, resp_who);
-			resp_who.erase();
+		for (it = _user.begin(); it != _user.end(); it++) {
+			User &currentUser = it->second;
+			if (currentUser.searchChannel(channel)) {
+
+				if (currentUser.getIsOperator(channel) == true)
+					op = "@";
+				else
+					op = "";
+
+				resp_who = ":" + (string) IP_SERV + " 354 " + _user[socketUser].getNickName() + " 152 " + channel +
+						   " " + currentUser.getNickName() + " :H" + op + "\r\n";
+				sendToClient(socketUser, resp_who);
+				resp_who.erase();
+			}
 		}
-		else {
-			resp_who = ":" + (string) IP_SERV + " 354 " + _user[socketUser].getNickName() + " 152 " + channel +
-					" " + currentUser.getNickName() + " :H\r\n";
-			sendToClient(socketUser, resp_who);
-			resp_who.erase();
-		}
-	}
-	resp_who =  ":" + (string) IP_SERV + " 315 " + _user[socketUser].getNickName() + " " + channel + " :End of /WHO list.\r\n";
-	sendToClient(socketUser, resp_who);
+		resp_who =  ":" + (string) IP_SERV + " 315 " + _user[socketUser].getNickName() + " " + channel + " :End of /WHO list.\r\n";
+		sendToClient(socketUser, resp_who);
+		resp_who.erase();
+		op.erase();
 	}
 	else {
-		if (_whoIsOP[channel] == _user[socketUser].getNickName()) {
-			std::string response4 =
-					":" + (string) IP_SERV + " 353 " + _user[socketUser].getNickName() + " = " + channel +
-						" :@" + _user[socketUser].getNickName() + "\r\n"
-							  ":" + (string) IP_SERV + " 315 " + _user[socketUser].getNickName() +
-								" " + channel + " :End of /WHO list.\r\n";
-			sendToClient(socketUser, response4);
-		}
-		else {
-			std::string response4 =
-					":" + (string) IP_SERV + " 353 " + _user[socketUser].getNickName() + " = " + channel +
-						" :@" + _whoIsOP[channel] + " " + _user[socketUser].getNickName() + "\r\n"
-								":" + (string) IP_SERV +" 315 " + _user[socketUser].getNickName() +
-									" " + channel + " :End of /WHO list.\r\n";
-			sendToClient(socketUser, response4);
-		}
+		if (_user[socketUser].getIsOperator(channel) == true)
+			op = "";
+		else
+			op = _whoIsOP[channel] + " ";
+
+		resp_who = ":" + (string) IP_SERV + " 353 " + _user[socketUser].getNickName() + " = " + channel +
+				   " :@" + op + _user[socketUser].getNickName() + "\r\n"
+				 	":" + (string) IP_SERV + " 315 " + _user[socketUser].getNickName() +
+					 " " + channel + " :End of /WHO list.\r\n";
+		sendToClient(socketUser, resp_who);
+		resp_who.erase();
+		op.erase();
 		_user[socketUser].setWho(true);
 	}
 	_cmd.clear();
 }
+
+//void	Client::who() {
+//	int socketUser = getClientSocket();
+//	std::map<std::string, std::string>::iterator it = _cmd.begin();
+//	std::string channel = it->second;
+//
+//
+//
+//	_cmd.clear();
+//}
 
 void    Client::kick(){
 	int socketUser = getClientSocket();
@@ -248,5 +264,24 @@ void Client::pass(){
 		sendToClient(getClientSocket(), "Error bad password: " + password + "\r\n");
 		sendToClient(getClientSocket(), "Enter the password with /PASS\r\n");
 	}
+	_cmd.clear();
+}
+
+void Client::quit() {
+	int socketUser = getClientSocket();
+
+	for (std::map<int, User>::iterator it = _user.begin(); it != _user.end(); ++it) {
+
+		User currentUser = it->second;
+		if (currentUser.getSocketUser() != socketUser) {
+			std::string response =
+					":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
+					"@localhost " + "QUIT :Quit: Leaving\r\n";
+
+
+			sendToClient(currentUser.getSocketUser(), response);
+		}
+	}
+	eraseUser(socketUser);
 	_cmd.clear();
 }

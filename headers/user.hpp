@@ -23,7 +23,7 @@ protected:
 	bool							_moderator;
 	bool							_userCreate;
 	std::vector<std::string>		_channelName;
-
+	std::map<std::string, bool>		_isOperator;
 	bool 							_who;
 
 	bool							_PasswordIsValid;
@@ -41,26 +41,31 @@ public:
 	void				setUserName(const std::string &username);
 	void				setSocketUser(int socket_user);
 	void				setOperator(bool moderator);
+	void 				setIsOperator(std::string channel, bool isOperator);
 	void 				setUserCreate(bool usercreate);
 	void 				setChannelName(std::string channelname);
 	void 				setPasswordIsValid( bool passWordIsValid );
 	void 				setWho(bool who);
-
 
 	// GET
 	const std::string	&getNickName() const;
 	const std::string	&getUserName() const;
 	int					getSocketUser() const;
 	bool				getOperator() const;
+	bool 				getIsOperator(std::string channel) ;
 	bool 				getUserCreate() const;
 	std::vector<std::string> getChannelName() const;
 	bool 				searchChannel(std::string channelName) const;
 	bool 				getPasswordIsValid() const;
 	bool 				getWho() const;
 
-
     // Init nick n username
-    bool   initUserAndNick(std::string buffer);
+    bool   				initUserAndNick(std::string buffer);
+
+	void 				delChannelName(std::string channel);
+
+	void 				printAllChannel();
+
 };
 
 std::ostream &operator<<(std::ostream &o, User const &i);
