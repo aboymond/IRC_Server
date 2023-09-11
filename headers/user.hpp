@@ -47,8 +47,6 @@ public:
 	void 				setChannelName(std::string channelname);
 	void 				setPasswordIsValid( bool passWordIsValid );
 	void 				setWho(bool who);
-	void         		setIsOperator(std::string channel, bool isOperator);
-	bool         		getIsOperator(std::string channel);
 
 
 	// GET
@@ -62,10 +60,6 @@ public:
 	bool 				searchChannel(std::string channelName) const;
 	bool 				getPasswordIsValid() const;
 	bool 				getWho() const;
-
-
-	void 				printAllChannel();
-	void 				delChannelName(std::string channel);
 
 
     // Init nick n username

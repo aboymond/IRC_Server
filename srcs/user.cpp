@@ -162,18 +162,6 @@ void User::printAllChannel() {
 	}
 }
 
-bool         User::getIsOperator(std::string channel) {
-	bool tmp_isOP = false;
-	if(_isOperator.find(channel) != _isOperator.end()){
-		tmp_isOP = _isOperator[channel];
-	}
-	return (tmp_isOP);
-}
-
-void         User::setIsOperator(std::string channel, bool isOperator){
-	_isOperator.insert(std::make_pair(channel, isOperator));
-}
-
 void 		User::delChannelName(std::string channel) {
 	for (vector<std::string>::iterator it = _channelName.begin(); it != _channelName.end(); it++) {
 		cout << "it = " << *it << endl;
