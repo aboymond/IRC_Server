@@ -46,7 +46,13 @@ void		User::setOperator(bool moderator){
 }
 
 void 		User::setIsOperator(std::string channel, bool isOperator){
-	_isOperator.insert(std::make_pair(channel, isOperator));
+
+	if (_isOperator.find(channel) != _isOperator.end()) {
+		_isOperator[channel] = isOperator;
+	} else {
+		_isOperator.insert(make_pair(channel, isOperator));
+	}
+
 }
 
 void 		User::setUserCreate(bool usercreate){
@@ -86,12 +92,10 @@ bool		User::getOperator() const{
 }
 
 bool 		User::getIsOperator(std::string channel) {
-	bool tmp_isOP = false;
-	if(_isOperator.find(channel) != _isOperator.end()){
-		tmp_isOP = _isOperator[channel];
 
-	}
-	return (tmp_isOP);
+	if(_isOperator.find(channel) != _isOperator.end())
+		return (_isOperator[channel]);
+	return (false);
 }
 
 bool 		User::getUserCreate() const{
