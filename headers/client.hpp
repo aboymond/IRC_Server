@@ -2,7 +2,7 @@
 #define CLIENT_HPP
 
 
-#define NBR_OF_CMD 9
+#define NBR_OF_CMD 10
 
 #include "user.hpp"
 #include "server.hpp"
@@ -53,6 +53,7 @@ public:
 	void topic();
 	void mode();
 	void quit();
+	void invite();
 
 
 	//CHANNEL
@@ -79,6 +80,8 @@ public:
 	void setWhoIsOP(std::string channel, std::string nickname);
 	void printOutput(int numofoption, string message, int options, int fd);
 	bool UserIsOnChannel(std::string user, std::string channel);
+	int getSocketUserWithName(string user);
+
 
 
 

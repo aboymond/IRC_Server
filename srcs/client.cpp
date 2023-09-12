@@ -139,3 +139,14 @@ bool Client::UserIsOnChannel(std::string user, std::string channel) {
 	return false;
 }
 
+int Client::getSocketUserWithName(string user) {
+	for (std::map<int, User>::iterator it = _user.begin(); it != _user.end(); ++it) {
+		if (it->second.getNickName() == user)
+		{
+			int socketUserInvited = it->first;
+			return (socketUserInvited);
+		}
+	}
+	return (0);
+}
+

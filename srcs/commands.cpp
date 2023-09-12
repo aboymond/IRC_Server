@@ -29,9 +29,10 @@ void   Client::checkAndExecuteCmd() {
 		command[i] = std::toupper(command[i]);
 
 
-	std::string	cmd[NBR_OF_CMD] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PASS", "PART", "TOPIC", "MODE" };
+
+	std::string	cmd[NBR_OF_CMD] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PASS", "PART", "TOPIC", "INVITE", "MODE" };
 	void (Client::*ptr_command[NBR_OF_CMD]) (void) = { &Client::nick, &Client::join, &Client::who, &Client::kick,
-											  &Client::privmsg, &Client::pass, &Client::part, &Client::topic, &Client::mode };
+											  &Client::privmsg, &Client::pass, &Client::part, &Client::topic, &Client::invite, &Client::mode };
 	for (int i = 0; i < NBR_OF_CMD; i++) {
 
 		if (cmd[i] == command) {
@@ -253,25 +254,41 @@ void    Client::topic(){
 	string argument = it_argument->second;
 	string user = _user[socketUser].getUserName();
 	string channel = argument.substr(0, argument.find(' '));
-	string nameOfChannelTopic = argument.substr(argument.find(':'), argument.length());
-//	:*.freenode.net 482 USER2 #test42 :You do not have access to change the topic on this channel
-	string responseIfchannelNotExiste = ":*.@localhost 403 " + user + " " + nameOfChannelTopic + " :No such channel\r\n";
-	string responseIfChannelCanHaveTop = ":" + user + "!~" + user + "@localhost" + " TOPIC " + argument + "\r\n";
-	string responseIfUserHaveNoPermission = ":*.localhost 482 " + user + " " + channel + " :You do not have access to change the topic on this channel\r\n";
-	if (checkChannelExist(channel) == true)
+	size_t found = argument.find(' ');
+	if (found == string::npos)
 	{
-		if (_user[socketUser].getIsOperator(channel) == true)
-		{
-			sendToClient(socketUser, responseIfChannelCanHaveTop);
-
-		}
-		else
-		{
-			sendToClient(socketUser, responseIfUserHaveNoPermission);
-		}
+		string response = ":*.localhost 331 " + user + " " + channel + " :No topic is set.\r\n";
+		sendToClient(socketUser, response);
 	}
 	else
-		sendToClient(socketUser, responseIfchannelNotExiste);
+	{
+		string nameOfChannelTopic = argument.substr(argument.find(':'), argument.length());
+	//	:*.freenode.net 482 USER2 #test42 :You do not have access to change the topic on this channel
+		string responseIfchannelNotExiste = ":*.@localhost 403 " + user + " " + nameOfChannelTopic + " :No such channel\r\n";
+		string responseIfChannelCanHaveTop = ":" + user + "!~" + user + "@localhost" + " TOPIC " + argument + "\r\n";
+		string responseIfUserHaveNoPermission = ":*.localhost 482 " + user + " " + channel + " :You do not have access to change the topic on this channel\r\n";
+		if (checkChannelExist(channel) == true)
+
+		{
+			if (_user[socketUser].getOperator() == true)
+			{
+				for (map<int, User>::iterator it = _user.begin(); it != _user.end() ; ++it) {
+//					cout << "username = " << it->second.getUserName() << endl;
+					User currentUser = it->second;
+						string user = _user[socketUser].getUserName();
+						string response2 = ":" + user + "!~" + user + "@localhost TOPIC " + argument + "\r\n";
+						sendToClient(currentUser.getSocketUser(), response2);
+				}
+//				sendToClient(socketUser, responseIfChannelCanHaveTop);
+			}
+			else
+			{
+				sendToClient(socketUser, responseIfUserHaveNoPermission);
+			}
+		}
+		else
+			sendToClient(socketUser, responseIfchannelNotExiste);
+	}
 	_cmd.clear();
 }
 
@@ -396,5 +413,31 @@ void Client::quit() {
 		}
 	}
 	eraseUser(socketUser);
+	_cmd.clear();
+}
+
+void Client::invite() {
+	int socketUser = getClientSocket();
+
+	std::map<string, string>::iterator itArg = _cmd.begin();
+
+	string userWhoInvite = _user[socketUser].getNickName();
+	string argument = itArg->second;
+	string userToInvite = argument.substr(0, argument.find(' '));
+	string channel = argument.substr(argument.find('#'), argument.length());
+
+	string reponseIfUsercanBeInvited = ":" + userWhoInvite + "!~" + userWhoInvite + "@localhost" + " INVITE " + userToInvite + " " + channel + "\r\n";
+	string responseIfUserCanNotInvited = ":*.localhost 482 " + userWhoInvite + " " + channel + " :You must be a channel half-operator\r\n";
+	string InvitatitionIsDone = ":*.localhost 341 " + userWhoInvite + " " + userToInvite + " " + channel + "\r\n";
+	int socketUserInvite = getSocketUserWithName(userToInvite);
+	if (_user[socketUser].getIsOperator(channel) == true)
+	{
+		if (UserIsOnChannel(userToInvite, channel) == false)
+			sendToClient(socketUserInvite, reponseIfUsercanBeInvited);
+			sendToClient(socketUser, InvitatitionIsDone);
+	}
+	else
+		sendToClient(socketUser, responseIfUserCanNotInvited);
+
 	_cmd.clear();
 }
