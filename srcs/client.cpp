@@ -122,3 +122,20 @@ bool Client::passwordVerifier(int socketUser) {
 		return (true);
 }
 
+bool Client::UserIsOnChannel(std::string user, std::string channel) {
+	for (std::map<int, User>::iterator it = _user.begin(); it != _user.end(); ++it) {
+		if (it->second.getNickName() == user) {
+			vector <string> channelUser = it->second.getChannelName();
+			for (size_t i = 0; i < channelUser.size(); ++i) {
+				if (channelUser[i] == channel) {
+					cout << "user is on channel" << endl;
+					return (true);
+				}
+			}
+			cout << "user is not in this channel" << endl;
+			return (false);
+		}
+	}
+	return false;
+}
+

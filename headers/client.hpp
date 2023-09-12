@@ -2,7 +2,7 @@
 #define CLIENT_HPP
 
 
-#define NBR_OF_CMD 8
+#define NBR_OF_CMD 9
 
 #include "user.hpp"
 #include "server.hpp"
@@ -51,6 +51,7 @@ public:
 	void privmsg();
 	void part();
 	void topic();
+	void mode();
 	void quit();
 
 
@@ -77,6 +78,7 @@ public:
 	void sendToClient(int fd, std::string message);
 	void setWhoIsOP(std::string channel, std::string nickname);
 	void printOutput(int numofoption, string message, int options, int fd);
+	bool UserIsOnChannel(std::string user, std::string channel);
 
 
 
