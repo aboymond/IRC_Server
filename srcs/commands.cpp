@@ -71,6 +71,7 @@ void Client::join(){
 			User currentUser = it->second;
 			string responseToJoin = ":" + _user[clientSocket].getNickName() + "!~" + _user[clientSocket].getUserName() +
 							  "@localhost " + "JOIN " + ":" + channel + "\r\n";
+
 			sendToClient(currentUser.getSocketUser(), responseToJoin);
 
 		}
@@ -111,6 +112,7 @@ void    Client::who() {
 	std::string channel = it->second;
 	std::string resp_who;
 	std::string op;
+	std::string allUserInChan;
 
 	if (_user[socketUser].getWho() == true) {
 		map<int, User>::iterator it;
@@ -126,28 +128,55 @@ void    Client::who() {
 				else
 					op = "";
 
-				resp_who = ":*." + (string) IP_SERV + " 354 " + _user[socketUser].getNickName() + " 152 " + channel +
+				resp_who = ":*.localhost 354 " + _user[socketUser].getNickName() + " 152 " + channel +
 						   " " + currentUser.getNickName() + " :H" + op + "\r\n";
 				sendToClient(socketUser, resp_who);
 				resp_who.erase();
 			}
 		}
-		resp_who =  ":*." + (string) IP_SERV + " 315 " + _user[socketUser].getNickName() + " " + channel + " :End of /WHO list.\r\n";
+		resp_who =  ":*.localhost 315 " + _user[socketUser].getNickName() + " " + channel + " :End of /WHO list.\r\n";
 		sendToClient(socketUser, resp_who);
 		resp_who.erase();
 		op.erase();
 	}
 	else {
-		if (_user[socketUser].getIsOperator(channel) == true)
-			op = "@";
-		else
-			op = "@" + _whoIsOP[channel] + " ";
+//		if (_user[socketUser].getIsOperator(channel) == true)
+//			op = "@" + _whoIsOP[channel] + " ";
+//		else {
 
-		resp_who = ":*." + (string) IP_SERV + " 353 " + _user[socketUser].getNickName() + " = " + channel +
-				   " :" + op + _user[socketUser].getNickName() + "\r\n"
-				  	":*." + (string)IP_SERV + " 352 " + _user[socketUser].getNickName() + " " + channel + " ~" + _user[socketUser].getUserName() + " " + (string)IP_SERV + " *." + (string)IP_SERV + " " + _user[socketUser].getNickName() + " H :0\r\n"
-				 	":*." + (string) IP_SERV + " 315 " + _user[socketUser].getNickName() +
-					 " " + channel + " :End of /WHO list.\r\n";
+			for (std::map<int, User>::iterator it_userInChan = _user.begin(); it_userInChan != _user.end(); it_userInChan++) {
+				if (it_userInChan->second.searchChannel(channel) == true) {
+					if (it_userInChan->second.getIsOperator(channel) == true)
+						allUserInChan += "@" + it_userInChan->second.getNickName() + " ";
+					else
+						allUserInChan += it_userInChan->second.getNickName() + " ";
+
+				}
+
+			}
+
+//		}
+		resp_who = ":*.localhost 353 " + _user[socketUser].getNickName() + " = " + channel +
+				   " :" + op + allUserInChan + "\r\n"
+																 ":*.localhost 366 " + _user[socketUser].getNickName() + " " + channel + " :End of /NAMES list.\r\n";
+		sendToClient(socketUser, resp_who);
+		resp_who.erase();
+		for (std::map<int, User>::iterator it_user = _user.begin(); it_user != _user.end(); it_user++) {
+			User &currentUser = it_user->second;
+			if (currentUser.searchChannel(channel) == true) {
+				std::string addUserToAnotherChannel;
+				if (currentUser.getIsOperator(channel) == true)
+					addUserToAnotherChannel = ":*.localhost 352 " + _user[socketUser].getNickName() + " " + channel + " ~" + currentUser.getUserName() + " localhost localhost " + currentUser.getNickName() + " H@ :0\r\n";
+				else
+					addUserToAnotherChannel = ":*.localhost 352 " + _user[socketUser].getNickName() + " " + channel + " ~" + currentUser.getUserName() + " localhost localhost " + currentUser.getNickName() + " H :0\r\n";
+				sendToClient(_user[socketUser].getSocketUser(), addUserToAnotherChannel);
+			} else
+				continue;
+
+		}
+		resp_who = ":*.localhost 315 " + _user[socketUser].getNickName() +
+				   " " + channel + " :End of /WHO list.\r\n";
+
 		sendToClient(socketUser, resp_who);
 		resp_who.erase();
 		op.erase();
@@ -156,15 +185,13 @@ void    Client::who() {
 	_cmd.clear();
 }
 
-//void	Client::who() {
-//	int socketUser = getClientSocket();
-//	std::map<std::string, std::string>::iterator it = _cmd.begin();
-//	std::string channel = it->second;
-//
-//
-//
-//	_cmd.clear();
-//}
+
+
+
+
+
+
+
 
 void    Client::kick(){
 	int socketUser = getClientSocket();
@@ -222,10 +249,11 @@ void    Client::part(){
 	string commandAndChannel = "PART " + channelToleave;
 	cout << "channelToLeave = " << channelToleave << endl;
 	string user = _user[socketUser].getUserName();
+	string nick = _user[socketUser].getNickName();
 	string channel = channelToleave.substr(0, space);
 
 //	cout << "response = " << response << endl;
-	string response = ":" + user + "!~" + user + "@localhost" + " PART " + channel + " :\"Leaving\"\r\n";
+	string response = ":" + nick + "!~" + user + "@localhost" + " PART " + channel + " :\"Leaving\"\r\n";
 //	:USER2!~USER2@freenode-o6d.g28.dc9e5h.IP PART #test43 :"Leaving"
 		if (checkChannelExist(channel) == true)
 		{
@@ -234,7 +262,7 @@ void    Client::part(){
 				User currentUser = it->second;
 				if (currentUser.getSocketUser() != socketUser)
 				{
-					string response2 = ":" + _user[socketUser].getUserName() + "!~" + "@localhost" + " PART " + channel + " :\"Leaving\"\r\n";
+					string response2 = ":" + _user[socketUser].getNickName() + "!~" + "@localhost" + " PART " + channel + " :\"Leaving\"\r\n";
 					sendToClient(currentUser.getSocketUser(), response2);
 				}
 			}
@@ -394,6 +422,7 @@ void Client::mode() {
 	// o : :piow00!~aboymond@freenode-o6d.g28.dc9e5h.IP MODE #test42 +o :jean
 
 	//if (_user[socketUser].)
+	_cmd.clear();
 }
 
 
