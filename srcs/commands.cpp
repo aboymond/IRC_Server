@@ -76,6 +76,7 @@ void Client::join(){
 
 		}
 	}
+
 //	< :*.freenode.net 352 lois #test42 ~boris freenode-o6d.g28.dc9e5h.IP *.freenode.net jean H :0 Alexandre Boymond
 //	< :*.freenode.net 352 lois #test42 ~aboymond freenode-o6d.g28.dc9e5h.IP *.freenode.net piow00 H@ :0 Alexandre Boymond
 //	< :*.freenode.net 352 lois #test42 ~bichou freenode-o6d.g28.dc9e5h.IP *.freenode.net lois H :0 Alexandre Boymond
@@ -114,6 +115,8 @@ void    Client::who() {
 	std::string op;
 	std::string allUserInChan;
 
+//	:*.freenode.net 332 USER3 #test31 :test
+
 	if (_user[socketUser].getWho() == true) {
 		map<int, User>::iterator it;
 
@@ -133,6 +136,7 @@ void    Client::who() {
 				sendToClient(socketUser, resp_who);
 				resp_who.erase();
 			}
+
 		}
 		resp_who =  ":*.localhost 315 " + _user[socketUser].getNickName() + " " + channel + " :End of /WHO list.\r\n";
 		sendToClient(socketUser, resp_who);
@@ -143,7 +147,6 @@ void    Client::who() {
 //		if (_user[socketUser].getIsOperator(channel) == true)
 //			op = "@" + _whoIsOP[channel] + " ";
 //		else {
-
 			for (std::map<int, User>::iterator it_userInChan = _user.begin(); it_userInChan != _user.end(); it_userInChan++) {
 				if (it_userInChan->second.searchChannel(channel) == true) {
 					if (it_userInChan->second.getIsOperator(channel) == true)
@@ -194,85 +197,74 @@ void    Client::who() {
 
 
 void    Client::kick(){
-	int socketUser = getClientSocket();
-	map<std::string, std::string>::iterator it_chan = _cmd.begin();
-	map<std::string, std::string>::iterator it_argument = _cmd.begin();
-	map<int, User>::iterator it;
-	vector<string>::iterator it_channel;
+	int socketClient = getClientSocket();
+	map<string, string>::iterator argument = _cmd.begin();
 
-	string channel = extractChannelName(it_chan->second);
-	string userToKick = it_argument->second;
-	string commandAndChannel = "KICK " + channel;
-	size_t found = userToKick.find_last_of(' ');
-	string user = it_argument->second.substr(found + 1, it_argument->second.length() - found);
+	string nickname = _user[socketClient].getNickName();
+	string username = _user[socketClient].getUserName();
+	size_t space = argument->second.find(' ');
 
-	string response = ":" + user + "!~" + user + "@localhost " + commandAndChannel + " " + user + " :" + user + "\r\n";
-//	sendToClient(socketUser, response);
-	if (_user[socketUser].getOperator() == true)
+	string userToKick = argument->second.substr(space + 1, argument->second.length());
+
+
+	string channel = extractChannelName(argument->second);
+	string responseIfUserCanKick = ":" + nickname + "!~" + username + "@localhost KICK " + channel + " " + userToKick + " :" + nickname + "\r\n";
+	string responseIfUserNotExistInChannel = ":localhost 401 " + nickname + userToKick + " :No such Nick\r\n";
+	string responseIfUserIsNotOperator = ":*.localhost 482 " + nickname + " " + channel + " :You must be a channel half-operator\r\n";
+
+	std::map<int, User>::iterator it;
+	if (_user[socketClient].getIsOperator(channel))
 	{
-		if (checkChannelExist(channel) == true)
+		if (UserIsOnChannel(userToKick, channel))
 		{
-			for (it = _user.begin(); it != _user.end(); it++)
-			{
-				User &currentUser = it->second;
-				for (it_channel = currentUser.getChannelName().begin(); it_channel < currentUser.getChannelName().end(); ++it_channel) {
-					if (*it_channel == channel) {
-						if (currentUser.getNickName() != user) {
-							sendToClient(socketUser, response);
-						}
-						else
-							sendToClient(socketUser, ":" + (string)IP_SERV + " 401 " + _user[socketUser].getNickName() + " " + user + " :No such Nick\r\n" );
-					}
-					else
-						sendToClient(socketUser, "Channel doesn't exist\r\n");
+			for (it = _user.begin();  it != _user.end() ; it++) {
+				if (it->second.getNickName() == userToKick)
+				{
+					_user[it->second.getSocketUser()].delChannelName(channel);
 				}
+				sendToClient(it->second.getSocketUser(), responseIfUserCanKick);
 			}
 		}
 		else
-			sendToClient(socketUser, "Channel doesn't exist\r\n");
+			sendToClient(socketClient, responseIfUserNotExistInChannel);
 	}
+	else
+		sendToClient(socketClient, responseIfUserIsNotOperator);
 	_cmd.clear();
 }
 
 void    Client::part(){
-	int socketUser = getClientSocket();
-//	map<std::string, std::string>::iterator it_chan = _cmd.begin();
-	map<std::string, std::string>::iterator it_argument = _cmd.begin();
-	map<int, User>::iterator it;
-	vector<string>::iterator it_channel;
-	size_t 					space;
 
-//	string channel = extractChannelName(it_chan->second);
-//	cout << "channel = " << channel << endl;
-	string channelToleave = it_argument->second;
-	space = channelToleave.find(' ');
-	string commandAndChannel = "PART " + channelToleave;
-	cout << "channelToLeave = " << channelToleave << endl;
-	string user = _user[socketUser].getUserName();
-	string nick = _user[socketUser].getNickName();
-	string channel = channelToleave.substr(0, space);
 
-//	cout << "response = " << response << endl;
-	string response = ":" + nick + "!~" + user + "@localhost" + " PART " + channel + " :\"Leaving\"\r\n";
-//	:USER2!~USER2@freenode-o6d.g28.dc9e5h.IP PART #test43 :"Leaving"
-		if (checkChannelExist(channel) == true)
+//	:USER1!~USER11@freenode-o6d.g28.dc9e5h.IP PART #test3 :"Leaving"
+
+
+//	:*.freenode.net 403 USER3 #fsdfsdfs :No such channel
+
+
+	int socketClient = getClientSocket();
+	map<string, string>::iterator argument = _cmd.begin();
+
+	string nickname = _user[socketClient].getNickName();
+	string username = _user[socketClient].getUserName();
+
+	string channel = extractChannelName(argument->second);
+	string responseIfUserCanLeaveChannel = ":" + nickname + "!~" + username + "@localhost PART " + channel + " :\"Leaving\"\r\n";
+	string responseIfChannelNotExist = ":*.localhost 403 " + nickname + " " + channel + " :No such channel\r\n";
+
+	std::map<int, User>::iterator it;
+		if (checkChannelExist(channel))
 		{
-			for (map<int, User>::iterator it = _user.begin(); it != _user.end() ; ++it) {
-				cout << "username = " << it->second.getUserName() << endl;
-				User currentUser = it->second;
-				if (currentUser.getSocketUser() != socketUser)
+			for (it = _user.begin();  it != _user.end() ; it++) {
+				if (it->second.getNickName() == nickname)
 				{
-					string response2 = ":" + _user[socketUser].getNickName() + "!~" + "@localhost" + " PART " + channel + " :\"Leaving\"\r\n";
-					sendToClient(currentUser.getSocketUser(), response2);
+					_user[it->second.getSocketUser()].delChannelName(channel);
 				}
+				sendToClient(it->second.getSocketUser(), responseIfUserCanLeaveChannel);
 			}
-			sendToClient(socketUser, response);
-			_user[socketUser].delChannelName(channel);
 		}
 		else
-			sendToClient(socketUser, "Channel doesn't exist\r\n");
-
-	_user[socketUser].printAllChannel();
+			sendToClient(socketClient, responseIfChannelNotExist);
 	_cmd.clear();
 }
 
@@ -280,34 +272,38 @@ void    Client::topic(){
 	int socketUser = getClientSocket();
 	map<std::string, std::string>::iterator it_argument = _cmd.begin();
 	string argument = it_argument->second;
+	string nick = _user[socketUser].getNickName();
 	string user = _user[socketUser].getUserName();
 	string channel = argument.substr(0, argument.find(' '));
 	size_t found = argument.find(' ');
 	if (found == string::npos)
 	{
-		string response = ":*.localhost 331 " + user + " " + channel + " :No topic is set.\r\n";
+		string response = ":*.localhost 331 " + nick + " " + channel + " :No topic is set.\r\n";
 		sendToClient(socketUser, response);
 	}
 	else
 	{
 		string nameOfChannelTopic = argument.substr(argument.find(':'), argument.length());
-	//	:*.freenode.net 482 USER2 #test42 :You do not have access to change the topic on this channel
-		string responseIfchannelNotExiste = ":*.@localhost 403 " + user + " " + nameOfChannelTopic + " :No such channel\r\n";
-		string responseIfChannelCanHaveTop = ":" + user + "!~" + user + "@localhost" + " TOPIC " + argument + "\r\n";
-		string responseIfUserHaveNoPermission = ":*.localhost 482 " + user + " " + channel + " :You do not have access to change the topic on this channel\r\n";
+		//    :*.freenode.net 482 USER2 #test42 :You do not have access to change the topic on this channel
+		string responseIfchannelNotExiste = ":*.@localhost 403 " + nick + " " + nameOfChannelTopic + " :No such channel\r\n";
+		string responseIfChannelCanHaveTop = ":" + nick + "!~" + user + "@localhost" + " TOPIC " + argument + "\r\n";
+		string responseIfUserHaveNoPermission = ":*.localhost 482 " + nick + " " + channel + " :You do not have access to change the topic on this channel\r\n";
 		if (checkChannelExist(channel) == true)
-
 		{
-			if (_user[socketUser].getOperator() == true)
+			if (_user[socketUser].getIsOperator(channel) == true)
 			{
 				for (map<int, User>::iterator it = _user.begin(); it != _user.end() ; ++it) {
-//					cout << "username = " << it->second.getUserName() << endl;
+//                    cout << "username = " << it->second.getUserName() << endl;
 					User currentUser = it->second;
+					if (currentUser.searchChannel(channel) == true) {
 						string user = _user[socketUser].getUserName();
-						string response2 = ":" + user + "!~" + user + "@localhost TOPIC " + argument + "\r\n";
+						string nick = _user[socketUser].getNickName();
+						string response2 = ":" + nick + "!~" + user + "@localhost TOPIC " + argument + "\r\n";
 						sendToClient(currentUser.getSocketUser(), response2);
+//						_channelTopic.insert(make_pair(channel, true));
+					}
 				}
-//				sendToClient(socketUser, responseIfChannelCanHaveTop);
+//                sendToClient(socketUser, responseIfChannelCanHaveTop);
 			}
 			else
 			{
@@ -316,6 +312,7 @@ void    Client::topic(){
 		}
 		else
 			sendToClient(socketUser, responseIfchannelNotExiste);
+
 	}
 	_cmd.clear();
 }
