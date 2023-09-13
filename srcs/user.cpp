@@ -62,6 +62,13 @@ void 		User::setUserHaveGoodPassForEnterInChannel(std::string channel, bool pass
 		_userHaveGoodPassForEnterInChannel.insert(make_pair(channel, passwordStatus));
 	}
 }
+void 		User::setAccessWithInvite(std::string channel, bool access) {
+	if (_accessWithInvite.find(channel) != _accessWithInvite.end()) {
+		_accessWithInvite[channel] = access;
+	} else {
+		_accessWithInvite.insert(make_pair(channel, access));
+	}
+}
 
 void 		User::setUserCreate(bool usercreate){
 	_userCreate = usercreate;
@@ -120,6 +127,10 @@ vector<string>	User::getChannelName() const{
 
 bool 			User::getUserHaveGoodPassForEnterInChannel(std::string channel) {
 	return (_userHaveGoodPassForEnterInChannel[channel]);
+}
+
+bool 			User::getAccessWithInvite(std::string channel) {
+	return (_accessWithInvite[channel]);
 }
 
 
