@@ -29,6 +29,8 @@ private:
 	map <string, string>    _cmd;
 	std::map <std::string, std::string>	_whoIsOP;
 
+//	map<map<string, string>, bool> _channelTopic;
+
 public:
 	Client();
 	Client(Client const &src);
@@ -81,6 +83,7 @@ public:
 	void printOutput(int numofoption, string message, int options, int fd);
 	bool UserIsOnChannel(std::string user, std::string channel);
 	int getSocketUserWithName(string user);
+	void eraseChannelUser(string channel, string user);
 
 
 
