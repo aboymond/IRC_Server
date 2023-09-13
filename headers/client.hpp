@@ -31,6 +31,8 @@ private:
 	std::map<std::string, std::string>	_passwordChannel;
 	std::map<std::string, bool>			_channelBlockedByPassword;
 
+//	map<map<string, string>, bool> _channelTopic;
+
 public:
 	Client();
 	Client(Client const &src);
@@ -94,6 +96,8 @@ public:
 	int		getSocketUserWithName(string user);
 	bool	passwordVerifier(int socketUser);
 	void	erasePasswordChannel(std::string channel);
+	void eraseChannelUser(string channel, string user);
+
 
 
 
