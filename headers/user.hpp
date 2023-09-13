@@ -25,6 +25,7 @@ protected:
 	std::vector<std::string>		_channelName;
 	std::map<std::string, bool>     _isOperator;
 	std::map<std::string, bool>		_userHaveGoodPassForEnterInChannel;
+	std::map<std::string, bool>		_accessWithInvite;
 
 	bool 							_who;
 
@@ -50,7 +51,9 @@ public:
 	void 				setPasswordIsValid( bool passWordIsValid );
 	void 				setUserHaveGoodPassForEnterInChannel(std::string channel, bool passwordStatus);
 	void 				setWho(bool who);
+	void 				setAccessWithInvite(std::string channel, bool access);
 	void 				setChannelandTopic(std::string channel, std::string topic);
+
 
 
 	// GET
@@ -65,15 +68,14 @@ public:
 	bool 				getPasswordIsValid() const;
 	bool 				getWho() const;
 	bool 				getUserHaveGoodPassForEnterInChannel(std::string channel);
+	bool 				getAccessWithInvite(std::string channel);
 	std::string 				getChannelTopic(std::string channel);
 
 
 
     // Init nick n username
-    bool   				initUserAndNick(std::string buffer);
-
+  bool   				initUserAndNick(std::string buffer);
 	void 				delChannelName(std::string channel);
-
 	void 				printAllChannel();
 	void 				printChannelTopic();
 	bool                userIsOnChannelWithTopic(std::string channel);

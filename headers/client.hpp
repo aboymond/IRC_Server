@@ -19,11 +19,12 @@ class Client {
 
 private:
 	Server  *_server;
-	//User    *_userPointer;
 	string  _command;
 	string  _options;
 	string  _currentOP;
 	string 	_serverPassword;
+	map<std::string, bool> 	_setFullAccessForTopic;
+	map<std::string, bool> 	_setFullAccessInChannel;
 	int     _clientSocket;
 	map <int, User>         _user;
 	map <string, string>    _cmd;
@@ -60,9 +61,9 @@ public:
 
 	//OPTIONS MODE
 	void	option_o(std::string channel, std::string arg, std::string nickName);
-	void	option_i();
-	void	option_t();
 	void	option_k(std::string channel, std::string arg, std::string passWord);
+	void	option_i(std::string channel, std::string option);
+	void	option_t(std::string channel, std::string option);
 
 
 	//CHANNEL
