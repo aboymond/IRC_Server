@@ -30,6 +30,7 @@ protected:
 	bool 							_who;
 
 	bool							_PasswordIsValid;
+	std::map<std::string, std::string> _channelTopic;
 
 
 public:
@@ -51,6 +52,8 @@ public:
 	void 				setUserHaveGoodPassForEnterInChannel(std::string channel, bool passwordStatus);
 	void 				setWho(bool who);
 	void 				setAccessWithInvite(std::string channel, bool access);
+	void 				setChannelandTopic(std::string channel, std::string topic);
+
 
 
 	// GET
@@ -66,14 +69,18 @@ public:
 	bool 				getWho() const;
 	bool 				getUserHaveGoodPassForEnterInChannel(std::string channel);
 	bool 				getAccessWithInvite(std::string channel);
+	std::string 				getChannelTopic(std::string channel);
+
 
 
     // Init nick n username
-    bool   				initUserAndNick(std::string buffer);
-
+  bool   				initUserAndNick(std::string buffer);
 	void 				delChannelName(std::string channel);
-
 	void 				printAllChannel();
+	void 				printChannelTopic();
+	bool                userIsOnChannelWithTopic(std::string channel);
+
+
 
 
 

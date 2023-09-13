@@ -199,6 +199,33 @@ void 		User::delChannelName(std::string channel) {
   }
 }
 
+void	User::setChannelandTopic(std::string channel, std::string topic) {
+	_channelTopic.insert(std::make_pair(channel, topic));
+}
+
+void User::printChannelTopic() {
+	std::map<string, string>::iterator it;
+	for (it = _channelTopic.begin(); it != _channelTopic.end(); ++it) {
+		cout << "channel = " << it->first << endl;
+		cout << "topic = " << it->second << endl;
+	}
+}
+
+bool User::userIsOnChannelWithTopic(string channel) {
+	std::map<string, string>::iterator it;
+
+	for (it = _channelTopic.begin(); it != _channelTopic.end(); ++it) {
+		if (it->first == channel)
+			return true;
+	}
+	return (false);
+}
+
+string User::getChannelTopic(string channel) {
+		return (_channelTopic[channel]);
+}
+
+
 
 std::ostream &operator<<(std::ostream &o, User const &i) {
 	o << "Username " << i.getUserName() << "\n"
