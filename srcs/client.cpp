@@ -56,6 +56,26 @@ std::string Client::getWhoIsOP_Nick(std::string channel) {
 	return (tmp_nick);
 }
 
+const std::string 	&Client::getPasswordChannel(std::string channel) {
+	return (_passwordChannel[channel]);
+}
+
+bool 				Client::getChannelBlockedByPassword(std::string channel) {
+	return (_channelBlockedByPassword[channel]);
+}
+
+void 		Client::setPasswordChannel(const std::string &channel, std::string passWordChannel) {
+
+	if (_passwordChannel.find(channel) != _passwordChannel.end()) {
+		_channelBlockedByPassword[channel] = true;
+		_passwordChannel[channel] = passWordChannel;
+	} else {
+		_channelBlockedByPassword.insert(make_pair(channel, true));
+		_passwordChannel.insert(make_pair(channel, passWordChannel));
+	}
+
+}
+
 int Client::addUser(string buffer, int socketUser) {
 	if (_user.find(socketUser) != _user.end() && _user[socketUser].getUserCreate() == true) {
 		//printOutput(1, buffer, 0, socketUser);
@@ -148,5 +168,12 @@ int Client::getSocketUserWithName(string user) {
 		}
 	}
 	return (0);
+}
+
+void		Client::erasePasswordChannel(std::string channel) {
+	if (_passwordChannel.find(channel) != _passwordChannel.end()) {
+		_channelBlockedByPassword[channel] = false;
+		_passwordChannel[channel].erase();
+	}
 }
 
