@@ -170,19 +170,22 @@ void    Client::who() {
 		op.erase();
 	}
 	else {
-//		if (_user[socketUser].getIsOperator(channel) == true)
-//			op = "@" + _whoIsOP[channel] + " ";
-//		else {
-			for (std::map<int, User>::iterator it_userInChan = _user.begin(); it_userInChan != _user.end(); it_userInChan++) {
-				if (it_userInChan->second.searchChannel(channel) == true) {
-					if (it_userInChan->second.getIsOperator(channel) == true)
-						allUserInChan += "@" + it_userInChan->second.getNickName() + " ";
-					else
-						allUserInChan += it_userInChan->second.getNickName() + " ";
-
-				}
+		for (std::map<int, User>::iterator it_userInChan = _user.begin(); it_userInChan != _user.end(); it_userInChan++) {
+			User &currentuser = it_userInChan->second;
+			if (currentuser.userIsOnChannelWithTopic(channel))
+			{
+				string response = ":*.localhost 332 " + _user[socketUser].getNickName() + " " + channel + " " + currentuser.getChannelTopic(channel) + "\r\n";
+				sendToClient(socketUser, response);
+			}
+			if (it_userInChan->second.searchChannel(channel) == true) {
+				if (it_userInChan->second.getIsOperator(channel) == true)
+					allUserInChan += "@" + it_userInChan->second.getNickName() + " ";
+				else
+					allUserInChan += it_userInChan->second.getNickName() + " ";
 
 			}
+
+		}
 
 //		}
 		resp_who = ":*.localhost 353 " + _user[socketUser].getNickName() + " = " + channel +
@@ -326,9 +329,9 @@ void    Client::topic(){
 						string nick = _user[socketUser].getNickName();
 						string response2 = ":" + nick + "!~" + user + "@localhost TOPIC " + argument + "\r\n";
 						sendToClient(currentUser.getSocketUser(), response2);
-
-//						_channelTopic.insert(make_pair(channel, true));
-
+//						_user[socketUser].setChannelandTopic(true, channel, nameOfChannelTopic);
+						_user[socketUser].setChannelandTopic(channel, nameOfChannelTopic);
+//						_user[socketUser].printChannelTopic();
 					}
 				}
 //                sendToClient(socketUser, responseIfChannelCanHaveTop);
