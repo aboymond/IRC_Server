@@ -23,7 +23,8 @@ protected:
 	bool							_moderator;
 	bool							_userCreate;
 	std::vector<std::string>		_channelName;
-	std::map<std::string, bool>        _isOperator;
+	std::map<std::string, bool>     _isOperator;
+	std::map<std::string, bool>		_userHaveGoodPassForEnterInChannel;
 
 	bool 							_who;
 
@@ -42,10 +43,11 @@ public:
 	void				setUserName(const std::string &username);
 	void				setSocketUser(int socket_user);
 	void				setOperator(bool moderator);
-	void 				setIsOperator(std::string channel, bool isOperator);
+	void 				setIsOperator(const std::string &channel, bool isOperator);
 	void 				setUserCreate(bool usercreate);
 	void 				setChannelName(std::string channelname);
 	void 				setPasswordIsValid( bool passWordIsValid );
+	void 				setUserHaveGoodPassForEnterInChannel(std::string channel, bool passwordStatus);
 	void 				setWho(bool who);
 
 
@@ -54,12 +56,13 @@ public:
 	const std::string	&getUserName() const;
 	int					getSocketUser() const;
 	bool				getOperator() const;
-	bool 				getIsOperator(std::string channel) ;
+	bool 				&getIsOperator(std::string channel);
 	bool 				getUserCreate() const;
 	std::vector<std::string> getChannelName() const;
 	bool 				searchChannel(std::string channelName) const;
 	bool 				getPasswordIsValid() const;
 	bool 				getWho() const;
+	bool 				getUserHaveGoodPassForEnterInChannel(std::string channel);
 
 
     // Init nick n username
@@ -68,6 +71,10 @@ public:
 	void 				delChannelName(std::string channel);
 
 	void 				printAllChannel();
+
+
+
+
 
 };
 

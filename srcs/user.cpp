@@ -45,7 +45,7 @@ void		User::setOperator(bool moderator){
 	_moderator = moderator;
 }
 
-void 		User::setIsOperator(std::string channel, bool isOperator){
+void 		User::setIsOperator(const std::string &channel, bool isOperator){
 
 	if (_isOperator.find(channel) != _isOperator.end()) {
 		_isOperator[channel] = isOperator;
@@ -53,6 +53,14 @@ void 		User::setIsOperator(std::string channel, bool isOperator){
 		_isOperator.insert(make_pair(channel, isOperator));
 	}
 
+}
+
+void 		User::setUserHaveGoodPassForEnterInChannel(std::string channel, bool passwordStatus) {
+	if (_userHaveGoodPassForEnterInChannel.find(channel) != _userHaveGoodPassForEnterInChannel.end()) {
+		_userHaveGoodPassForEnterInChannel[channel] = passwordStatus;
+	} else {
+		_userHaveGoodPassForEnterInChannel.insert(make_pair(channel, passwordStatus));
+	}
 }
 
 void 		User::setUserCreate(bool usercreate){
@@ -91,12 +99,11 @@ bool		User::getOperator() const{
 	return (_moderator);
 }
 
-bool 		User::getIsOperator(std::string channel) {
-
-	if(_isOperator.find(channel) != _isOperator.end())
-		return (_isOperator[channel]);
-	return (false);
+bool 		&User::getIsOperator(std::string channel) {
+	return (_isOperator[channel]);
 }
+
+
 
 bool 		User::getUserCreate() const{
 	return (_userCreate);
@@ -109,6 +116,10 @@ bool 		User::getWho() const {
 
 vector<string>	User::getChannelName() const{
 	return (_channelName);
+}
+
+bool 			User::getUserHaveGoodPassForEnterInChannel(std::string channel) {
+	return (_userHaveGoodPassForEnterInChannel[channel]);
 }
 
 
@@ -176,6 +187,7 @@ void 		User::delChannelName(std::string channel) {
 		}
   }
 }
+
 
 std::ostream &operator<<(std::ostream &o, User const &i) {
 	o << "Username " << i.getUserName() << "\n"
