@@ -85,6 +85,7 @@ void Server::waitToNewConnection() {
 	socklen_t addrlen = sizeof(_serverAddress);
 	fd_set readfds;
 	Client client;
+	std::map<int, std::string> clientBuffers;
 
 	while (true) {
 		FD_ZERO(&readfds);
@@ -128,39 +129,35 @@ void Server::waitToNewConnection() {
 					buffer[val_read] = '\0';
 
 					client.printOutput(1, buffer, 0, sd);
-//					if (strncmp(buffer, "QUIT ", 5) == 0)
-//					{
-//						client.parsCommands(buffer);
-//						client.quit();
-//						_userSocket.erase(_userSocket.begin()+(int)i);
-//						client.eraseUser(sd);
-//						close(sd);
-//					}
-					if(client.addUser(buffer, sd)) {
-						if (client.passwordVerifier(sd) == false)
-						{
-							client.setServerPassword(_password);
-							client.setClientSocket(sd);
-							client.parsCommands(buffer);
-							client.pass();
-							if (strncmp(buffer, "QUIT ", 5) == 0) {
-								client.quit();
-								close(sd);
-								_userSocket.erase(_userSocket.begin() + (int)i);
-							}
-						}
-						else {
-							client.setClientSocket(sd);
-							client.parsCommands(buffer);
-							client.checkAndExecuteCmd();
-							if (strncmp(buffer, "QUIT ", 5) == 0) {
-								client.quit();
-								close(sd);
-								_userSocket.erase(_userSocket.begin() + (int)i);
-							}
-						}
-					}
+					size_t pos;
+					while ((pos = clientBuffers[sd].find("\n")) != std::string::npos) {
+						std::string fullMessage = clientBuffers[sd].substr(0, pos);
+						client.printOutput(1, fullMessage, 0, sd);
 
+						if (client.addUser(buffer, sd)) {
+							if (client.passwordVerifier(sd) == false) {
+								client.setServerPassword(_password);
+								client.setClientSocket(sd);
+								client.parsCommands(buffer);
+								client.pass();
+								if (strncmp(buffer, "QUIT ", 5) == 0) {
+									client.quit();
+									close(sd);
+									_userSocket.erase(_userSocket.begin() + (int) i);
+								}
+							} else {
+								client.setClientSocket(sd);
+								client.parsCommands(buffer);
+								client.checkAndExecuteCmd();
+								if (strncmp(buffer, "QUIT ", 5) == 0) {
+									client.quit();
+									close(sd);
+									_userSocket.erase(_userSocket.begin() + (int) i);
+								}
+							}
+						}
+						clientBuffers[sd].erase(0, pos + 2);
+					}
 				}
 			}
 

@@ -2,7 +2,7 @@
 #define CLIENT_HPP
 
 
-#define NBR_OF_CMD 10
+#define NBR_OF_CMD 12
 
 #include "user.hpp"
 #include "server.hpp"
@@ -47,6 +47,8 @@ public:
 	//CMD
 	void	parsCommands(string buffer);
 	void	checkAndExecuteCmd();
+	void    capls();
+	void    user();
 	void	nick();
 	void	join();
 	void	who();
