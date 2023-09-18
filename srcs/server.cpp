@@ -122,18 +122,22 @@ void Server::waitToNewConnection() {
 			if (FD_ISSET(sd, &readfds)) {
 				size_t val_read;
 				if ((val_read = recv(sd, buffer, 1024, 0)) == 0) {
+					cout << "rentre dans le if" <<endl;
 					client.eraseUser(sd);
 					close(sd);
 					_userSocket.erase(_userSocket.begin() + (int)i);
 				} else {
+					cout << "rentre dans le else" <<endl;
 					buffer[val_read] = '\0';
 
 					client.printOutput(1, buffer, 0, sd);
 					size_t pos;
-					while ((pos = clientBuffers[sd].find("\n")) != std::string::npos) {
+					clientBuffers[sd] += buffer;
+					while ((pos = clientBuffers[sd].find("\r\n")) != std::string::npos || (pos = clientBuffers[sd].find("\n")) != std::string::npos) {
 						std::string fullMessage = clientBuffers[sd].substr(0, pos);
 						client.printOutput(1, fullMessage, 0, sd);
 
+						cout << "buffer passe par la = " << fullMessage << endl;
 						if (client.addUser(buffer, sd)) {
 							if (client.passwordVerifier(sd) == false) {
 								client.setServerPassword(_password);
@@ -145,16 +149,17 @@ void Server::waitToNewConnection() {
 									close(sd);
 									_userSocket.erase(_userSocket.begin() + (int) i);
 								}
-							} else {
-								client.setClientSocket(sd);
-								client.parsCommands(buffer);
-								client.checkAndExecuteCmd();
-								if (strncmp(buffer, "QUIT ", 5) == 0) {
-									client.quit();
-									close(sd);
-									_userSocket.erase(_userSocket.begin() + (int) i);
-								}
 							}
+//							else {
+//								client.setClientSocket(sd);
+//								client.parsCommands(buffer);
+//								client.checkAndExecuteCmd();
+//								if (strncmp(buffer, "QUIT ", 5) == 0) {
+//									client.quit();
+//									close(sd);
+//									_userSocket.erase(_userSocket.begin() + (int) i);
+//								}
+//							}
 						}
 						clientBuffers[sd].erase(0, pos + 2);
 					}

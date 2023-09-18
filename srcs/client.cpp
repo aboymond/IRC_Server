@@ -77,18 +77,26 @@ void 		Client::setPasswordChannel(const std::string &channel, std::string passWo
 }
 
 int Client::addUser(string buffer, int socketUser) {
-	if (_user.find(socketUser) != _user.end() && _user[socketUser].getUserCreate() == true) {
-		//printOutput(1, buffer, 0, socketUser);
-		return (-1);
-	}
-	User newUser;
-
-	if (newUser.initUserAndNick(buffer) == true)
+	(void)buffer;
+	if (_user[socketUser].getUserCreate() == false) {
+		_user[socketUser].setUserCreate(socketUser);
 		_user[socketUser].setUserCreate(true);
-	newUser.setSocketUser(socketUser);
-	_user[socketUser] = newUser;
-	//printOutput(1, buffer, 0, socketUser);
+		cout << "IN ADD USER" << endl;
+		return (0);
+	}
 	return (0);
+//	if (_user.find(socketUser) != _user.end() && _user[socketUser].getUserCreate() == true) {
+//		//printOutput(1, buffer, 0, socketUser);
+//		return (-1);
+//	}
+//	User newUser;
+//
+//	if (newUser.initUserAndNick(buffer) == true)
+//		_user[socketUser].setUserCreate(true);
+//	newUser.setSocketUser(socketUser);
+//	_user[socketUser] = newUser;
+//	//printOutput(1, buffer, 0, socketUser);
+//	return (0);
 }
 
 void Client::eraseUser(int socketUser){
