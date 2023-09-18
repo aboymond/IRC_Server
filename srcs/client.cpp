@@ -77,18 +77,38 @@ void 		Client::setPasswordChannel(const std::string &channel, std::string passWo
 }
 
 int Client::addUser(string buffer, int socketUser) {
-	if (_user.find(socketUser) != _user.end() && _user[socketUser].getUserCreate() == true) {
-		//printOutput(1, buffer, 0, socketUser);
-		return (-1);
-	}
-	User newUser;
+	(void)buffer;
+	if (_user[socketUser].getUserCreate() == false) {
+		if (_user[socketUser].getNickName().empty()) {
+			stringstream ss;
+			ss << socketUser;
+			string sock = ss.str();
+			_user[socketUser].setNickName("Nick" + sock);
+			_user[socketUser].setUserName("User" + sock);
+			_user[socketUser].setSocketUser(socketUser);
+			_user[socketUser].setUserCreate(true);
 
-	if (newUser.initUserAndNick(buffer) == true)
-		_user[socketUser].setUserCreate(true);
-	newUser.setSocketUser(socketUser);
-	_user[socketUser] = newUser;
-	//printOutput(1, buffer, 0, socketUser);
+		}
+		cout << "IN ADD USER" << endl;
+		return (0);
+	}
+	if (passwordVerifier(socketUser) == true && _user[socketUser].getItsOKToAddNick() && _user[socketUser].getHasSetNick() == false) {
+		_user[socketUser].initUserAndNick();
+		_user[socketUser].setHasSetNick(true);
+	}
 	return (0);
+//	if (_user.find(socketUser) != _user.end() && _user[socketUser].getUserCreate() == true) {
+//		//printOutput(1, buffer, 0, socketUser);
+//		return (-1);
+//	}
+//	User newUser;
+//
+//	if (newUser.initUserAndNick(buffer) == true)
+//		_user[socketUser].setUserCreate(true);
+//	newUser.setSocketUser(socketUser);
+//	_user[socketUser] = newUser;
+//	//printOutput(1, buffer, 0, socketUser);
+//	return (0);
 }
 
 void Client::eraseUser(int socketUser){
@@ -127,10 +147,14 @@ bool Client::getStatusPasswordClient(int socketUser) {
 string Client::extractChannelName(string buffer) {
 
 	size_t found = buffer.find('#');
-//	found += 1;
-
-	string channel = buffer.substr(found, buffer.find(' ', found) - found);
-	return (channel);
+	string channel;
+//    found += 1;
+	if (found != std::string::npos)
+	{
+		string channel = buffer.substr(found, buffer.find(' ', found) - found);
+		return (channel);
+	}
+	return (channel = "NULL");
 }
 
 bool Client::passwordVerifier(int socketUser) {
@@ -175,5 +199,11 @@ void		Client::erasePasswordChannel(std::string channel) {
 		_channelBlockedByPassword[channel] = false;
 		_passwordChannel[channel].erase();
 	}
+}
+
+void	Client::addBufferToTmpVector(std::string tmpBuffer) {
+	int clientSocket = getClientSocket();
+	 _user[clientSocket].setTmpVectorBuffer(tmpBuffer);
+	 _user[clientSocket].setItsOKToAddNick(true);
 }
 

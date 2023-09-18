@@ -32,7 +32,7 @@ void Client::printOutput(int numofoption, string message, int options, int fd) {
 			cout << "NICKNAME [ \033[1;93m" << checkUser.getNickName() << "\033[0m ]" << endl;
 			cout << "USERNAME [ \033[1;93m" << checkUser.getUserName() << "\033[0m ]" << endl;
 			cout << "PASSWORD [ \033[1;93m" << checkUser.getPasswordIsValid() << "\033[0m ]" << endl;
-			cout << "<<<<  \033[1;93m" << message << "\033[0m";
+			cout << "<<<<  \033[1;93m" << message << "\033[0m" << endl;
 
 			cout << "\033[1;93m----------------------------\033[0m\n" << endl;
 		}
@@ -42,7 +42,7 @@ void Client::printOutput(int numofoption, string message, int options, int fd) {
 			cout << "FROM SERVER TO CLIENT [ \033[1;96m" << checkUser.getSocketUser() << "\033[0m ]" << endl;
 			cout << "NICKNAME [ \033[1;96m" << checkUser.getNickName() << "\033[0m ]" << endl;
 			cout << "USERNAME [ \033[1;96m" << checkUser.getUserName() << "\033[0m ]" << endl;
-			cout << ">>>> \033[1;96m" << message << "\033[0m";
+			cout << ">>>> \033[1;96m" << message << "\033[0m" << endl;
 
 			cout << "\033[1;96m----------------------------\033[0m\n" << endl;
 		}

@@ -31,6 +31,9 @@ protected:
 
 	bool							_PasswordIsValid;
 	std::map<std::string, std::string> _channelTopic;
+	std::vector<std::string>			_tmpBuffer;
+	bool 								_itsOKToAddNick;
+	bool 								_hasSetNick;
 
 
 public:
@@ -53,6 +56,9 @@ public:
 	void 				setWho(bool who);
 	void 				setAccessWithInvite(std::string channel, bool access);
 	void 				setChannelandTopic(std::string channel, std::string topic);
+	void				setTmpVectorBuffer(std::string &tmpBuffer);
+	void				setItsOKToAddNick(bool istoktoaddnick);
+	void 				setHasSetNick(bool hassetnick);
 
 
 
@@ -69,12 +75,14 @@ public:
 	bool 				getWho() const;
 	bool 				getUserHaveGoodPassForEnterInChannel(std::string channel);
 	bool 				getAccessWithInvite(std::string channel);
-	std::string 				getChannelTopic(std::string channel);
+	std::string 		getChannelTopic(std::string channel);
+	bool				getItsOKToAddNick() const;
+	bool 				getHasSetNick() const;
 
 
 
     // Init nick n username
-  bool   				initUserAndNick(std::string buffer);
+  bool   				initUserAndNick();
 	void 				delChannelName(std::string channel);
 	void 				printAllChannel();
 	void 				printChannelTopic();

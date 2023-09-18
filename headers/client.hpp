@@ -2,7 +2,7 @@
 #define CLIENT_HPP
 
 
-#define NBR_OF_CMD 10
+#define NBR_OF_CMD 12
 
 #include "user.hpp"
 #include "server.hpp"
@@ -33,6 +33,7 @@ private:
 	std::map<std::string, bool>			_channelBlockedByPassword;
 
 
+
 public:
 	Client();
 	Client(Client const &src);
@@ -47,6 +48,8 @@ public:
 	//CMD
 	void	parsCommands(string buffer);
 	void	checkAndExecuteCmd();
+	void    capls();
+	void    user();
 	void	nick();
 	void	join();
 	void	who();
@@ -97,6 +100,7 @@ public:
 	bool	passwordVerifier(int socketUser);
 	void	erasePasswordChannel(std::string channel);
 	void 	eraseChannelUser(string channel, string user);
+	void	addBufferToTmpVector(std::string tmpBuffer);
 
 
 

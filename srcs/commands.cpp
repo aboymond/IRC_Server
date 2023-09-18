@@ -2,13 +2,23 @@
 
 void Client::parsCommands(string buffer) {
 
+	if (passwordVerifier(getClientSocket()) != true ) {
+		addBufferToTmpVector(buffer);
+	}
 	std::stringstream ss(buffer);
 	std::string command;
 	std::string argument;
 	ss >> command;
 	std::getline(ss, argument);
+	size_t pos = argument.find('\r');
 
-	argument.erase(argument.length() - 1);
+	cout << "COMMAND avant = " << command << " | ARGUMENT avant = " << argument << endl;
+
+	if (pos != string::npos) {
+		argument.erase(pos);
+	}
+
+//	argument.erase(argument.length() - 1);
 	argument.erase(0, 1);
 
 	_cmd[command] = argument;
@@ -28,20 +38,27 @@ void   Client::checkAndExecuteCmd() {
 	for (size_t i = 0; i < command.length(); ++i)
 		command[i] = std::toupper(command[i]);
 
+	cout << "dans check command" << endl;
 
 
-	std::string	cmd[NBR_OF_CMD] = { "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PASS", "PART", "TOPIC", "INVITE", "MODE" };
-	void (Client::*ptr_command[NBR_OF_CMD]) (void) = { &Client::nick, &Client::join, &Client::who, &Client::kick,
-											  &Client::privmsg, &Client::pass, &Client::part, &Client::topic, &Client::invite, &Client::mode };
-	for (int i = 0; i < NBR_OF_CMD; i++) {
 
-		if (cmd[i] == command) {
-			(this->*ptr_command[i])();
-			commandFound = true;
+	if (passwordVerifier(getClientSocket()) == true || command == "PASS") {
+		std::string	cmd[NBR_OF_CMD] = { "CAP LS", "USER", "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PASS", "PART", "TOPIC", "INVITE", "MODE" };
+		void (Client::*ptr_command[NBR_OF_CMD]) (void) = { &Client::capls,&Client::user,&Client::nick, &Client::join, &Client::who, &Client::kick,
+												  &Client::privmsg, &Client::pass, &Client::part, &Client::topic, &Client::invite, &Client::mode };
+		for (int i = 0; i < NBR_OF_CMD; i++) {
+
+			if (cmd[i] == command) {
+				(this->*ptr_command[i])();
+				commandFound = true;
+			}
 		}
+		if (commandFound == false)
+			sendToClient(getClientSocket(), "Command not found: " + command + "\r\n");
 	}
-	if (commandFound == false)
-		sendToClient(getClientSocket(), "Command not found: " + command + "\r\n");
+
+
+
 	_cmd.clear();
 }
 
@@ -117,7 +134,7 @@ void Client::nick(){
 	std::map<std::string, std::string>::iterator it = _cmd.begin();
 	std::string nickname = it->second;
 
-	if (nickname.length() < 8) {
+	if (nickname.length() < 15) {
 		if (_user.find(socketUser) != _user.end()){
 			User checkUser = _user[socketUser];
 			checkUser.setNickName(nickname);
@@ -227,9 +244,15 @@ void    Client::kick(){
 	size_t space = argument->second.find(' ');
 
 	string userToKick = argument->second.substr(space + 1, argument->second.length());
+	string responseNoSuchChannel = ":*.localhost 403 " + nickname + " " + "localhost" + " :No such channel\r\n";
 
 
 	string channel = extractChannelName(argument->second);
+	if (channel == "NULL") {
+		sendToClient(socketClient, responseNoSuchChannel);
+		_cmd.clear();
+		return;
+	}
 	string responseIfUserCanKick = ":" + nickname + "!~" + username + "@localhost KICK " + channel + " " + userToKick + " :" + nickname + "\r\n";
 	string responseIfUserNotExistInChannel = ":localhost 401 " + nickname + userToKick + " :No such Nick\r\n";
 	string responseIfUserIsNotOperator = ":*.localhost 482 " + nickname + " " + channel + " :You must be a channel half-operator\r\n";
@@ -411,10 +434,11 @@ void Client::invite() {
 	int socketUserInvite = getSocketUserWithName(userToInvite);
 	if (_user[socketUser].getIsOperator(channel) == true)
 	{
-		if (UserIsOnChannel(userToInvite, channel) == false)
+		if (UserIsOnChannel(userToInvite, channel) == false) {
 			_user[socketUserInvite].setAccessWithInvite(channel, true);
 			sendToClient(socketUserInvite, reponseIfUsercanBeInvited);
 			sendToClient(socketUser, InvitatitionIsDone);
+		}
 	}
 	else
 		sendToClient(socketUser, responseIfUserCanNotInvited);
@@ -503,14 +527,14 @@ void Client::option_k(std::string channel, std::string option, std::string passW
 	else
 		arg_resp = "-k";
 
-		if (arg_resp == "+k") {
-			setPasswordChannel(channel, passWord);
-		}
-		else if (arg_resp == "-k" && getPasswordChannel(channel) == passWord) {
-			erasePasswordChannel(channel);
-		}
-		sendToClient(_user[socketUser].getSocketUser(), ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-				  "@localhost " + "MODE " + channel + " " + arg_resp + " :" + passWord +"\r\n" );
+	if (arg_resp == "+k") {
+		setPasswordChannel(channel, passWord);
+	}
+	else if (arg_resp == "-k" && getPasswordChannel(channel) == passWord) {
+		erasePasswordChannel(channel);
+	}
+	sendToClient(_user[socketUser].getSocketUser(), ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
+			  "@localhost " + "MODE " + channel + " " + arg_resp + " :" + passWord +"\r\n" );
 }
 
 void Client::option_t(std::string channel, std::string option) {
@@ -550,6 +574,33 @@ void Client::option_i(std::string channel, std::string option) {
 
 	std::string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() + "@localhost MODE " + channel + " :" + arg_resp + "\r\n";
 	sendToClient(socketUser, response);
+}
+
+void Client::capls() {
+	return;
+}
+
+void Client::user() {
+	int socketUser = getClientSocket();
+	std::map<std::string, std::string>::iterator it = _cmd.begin();
+	std::string username = it->second;
+
+	if (username.length() < 15) {
+		if (_user.find(socketUser) != _user.end()){
+			User checkUser = _user[socketUser];
+			checkUser.setNickName(username);
+			string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
+			                  "@localhost " + "USER :" + username + "\r\n";
+
+
+			sendToClient(socketUser, response);
+			_user[socketUser] = checkUser;
+		}
+	}
+	else {
+		sendToClient(socketUser, "Username to long, max 8 characters\r\n");
+	}
+	_cmd.clear();
 }
 
 
