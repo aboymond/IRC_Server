@@ -33,6 +33,7 @@ private:
 	std::map<std::string, bool>			_channelBlockedByPassword;
 
 
+
 public:
 	Client();
 	Client(Client const &src);
@@ -99,6 +100,7 @@ public:
 	bool	passwordVerifier(int socketUser);
 	void	erasePasswordChannel(std::string channel);
 	void 	eraseChannelUser(string channel, string user);
+	void	addBufferToTmpVector(std::string tmpBuffer);
 
 
 

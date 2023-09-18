@@ -7,7 +7,8 @@ User::User() :
 	_moderator(false),
 	_userCreate(false),
 	_who(false),
-	_PasswordIsValid(false)
+	_PasswordIsValid(false),
+	_hasSetNick(false)
 {
 	cout << "constructor user called" << endl;
 };
@@ -151,30 +152,26 @@ bool 		User::getPasswordIsValid() const{
 
 }
 
-bool    User::initUserAndNick(string buffer){
+bool    User::initUserAndNick(){
     std::string nickName;
     std::string userName;
-    istringstream iss(buffer);
-    string line;
-    size_t i = 5;
-    while (std::getline(iss, line, '\n')) {
-		if (line.find("CAP LS") == 0)
-			i = 13;
-        if (line.find("NICK ") == 0) {
-            while ( i < buffer.length() && buffer[i] != '\r') {
-                nickName.push_back(buffer[i]);
-                i++;
-            }
+
+    for (size_t i = 0; i < _tmpBuffer.size(); i++) {
+		if (_tmpBuffer[i].find("CAP LS") == 0)
+			i++;
+        if (_tmpBuffer[i].find("NICK ") == 0) {
+			stringstream ss1(_tmpBuffer[i]);
+			string cmd;
+			ss1 >> cmd >> nickName;
+			cout << "NICK IN INIT : " << nickName << endl;
             setNickName(nickName);
         }
-        if (line.find("USER ") == 0) {
-            i += 7;
-            while (i < buffer.length() && buffer[i] != ' ' && buffer[i] != '\r') {
-                userName.push_back(buffer[i]);
-                i++;
-            }
+        if (_tmpBuffer[i].find("USER ") == 0) {
+			stringstream ss2(_tmpBuffer[i]);
+			string cmd2;
+			ss2 >> cmd2 >> userName;
+			cout << "USER IN INIT : " << userName << endl;
             setUserName(userName);
-
         }
     }
 	if (nickName.empty())
@@ -231,6 +228,26 @@ std::ostream &operator<<(std::ostream &o, User const &i) {
 	o << "Username " << i.getUserName() << "\n"
 		 "Moderator = : " << i.getOperator() << "\n" << endl;
 	return (o);
+}
+
+void		User::setTmpVectorBuffer(std::string &tmpBuffer) {
+	_tmpBuffer.push_back(tmpBuffer);
+}
+
+void				User::setItsOKToAddNick(bool istoktoaddnick) {
+	_itsOKToAddNick = istoktoaddnick;
+}
+
+bool				User::getItsOKToAddNick() const {
+	return (_itsOKToAddNick);
+}
+
+void				User::setHasSetNick(bool hassetnick) {
+	_hasSetNick = hassetnick;
+}
+
+bool				User::getHasSetNick() const {
+	return (_hasSetNick);
 }
 
 

@@ -2,6 +2,9 @@
 
 void Client::parsCommands(string buffer) {
 
+	if (passwordVerifier(getClientSocket()) != true ) {
+		addBufferToTmpVector(buffer);
+	}
 	std::stringstream ss(buffer);
 	std::string command;
 	std::string argument;
@@ -9,11 +12,13 @@ void Client::parsCommands(string buffer) {
 	std::getline(ss, argument);
 	size_t pos = argument.find('\r');
 
+	cout << "COMMAND avant = " << command << " | ARGUMENT avant = " << argument << endl;
+
 	if (pos != string::npos) {
 		argument.erase(pos);
 	}
 
-	argument.erase(argument.length() - 1);
+//	argument.erase(argument.length() - 1);
 	argument.erase(0, 1);
 
 	_cmd[command] = argument;
@@ -33,20 +38,27 @@ void   Client::checkAndExecuteCmd() {
 	for (size_t i = 0; i < command.length(); ++i)
 		command[i] = std::toupper(command[i]);
 
+	cout << "dans check command" << endl;
 
 
-	std::string	cmd[NBR_OF_CMD] = { "CAP LS", "USER", "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PASS", "PART", "TOPIC", "INVITE", "MODE" };
-	void (Client::*ptr_command[NBR_OF_CMD]) (void) = { &Client::capls,&Client::user,&Client::nick, &Client::join, &Client::who, &Client::kick,
-											  &Client::privmsg, &Client::pass, &Client::part, &Client::topic, &Client::invite, &Client::mode };
-	for (int i = 0; i < NBR_OF_CMD; i++) {
 
-		if (cmd[i] == command) {
-			(this->*ptr_command[i])();
-			commandFound = true;
+	if (passwordVerifier(getClientSocket()) == true || command == "PASS") {
+		std::string	cmd[NBR_OF_CMD] = { "CAP LS", "USER", "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PASS", "PART", "TOPIC", "INVITE", "MODE" };
+		void (Client::*ptr_command[NBR_OF_CMD]) (void) = { &Client::capls,&Client::user,&Client::nick, &Client::join, &Client::who, &Client::kick,
+												  &Client::privmsg, &Client::pass, &Client::part, &Client::topic, &Client::invite, &Client::mode };
+		for (int i = 0; i < NBR_OF_CMD; i++) {
+
+			if (cmd[i] == command) {
+				(this->*ptr_command[i])();
+				commandFound = true;
+			}
 		}
+		if (commandFound == false)
+			sendToClient(getClientSocket(), "Command not found: " + command + "\r\n");
 	}
-	if (commandFound == false)
-		sendToClient(getClientSocket(), "Command not found: " + command + "\r\n");
+
+
+
 	_cmd.clear();
 }
 
@@ -232,9 +244,15 @@ void    Client::kick(){
 	size_t space = argument->second.find(' ');
 
 	string userToKick = argument->second.substr(space + 1, argument->second.length());
+	string responseNoSuchChannel = ":*.localhost 403 " + nickname + " " + "localhost" + " :No such channel\r\n";
 
 
 	string channel = extractChannelName(argument->second);
+	if (channel == "NULL") {
+		sendToClient(socketClient, responseNoSuchChannel);
+		_cmd.clear();
+		return;
+	}
 	string responseIfUserCanKick = ":" + nickname + "!~" + username + "@localhost KICK " + channel + " " + userToKick + " :" + nickname + "\r\n";
 	string responseIfUserNotExistInChannel = ":localhost 401 " + nickname + userToKick + " :No such Nick\r\n";
 	string responseIfUserIsNotOperator = ":*.localhost 482 " + nickname + " " + channel + " :You must be a channel half-operator\r\n";

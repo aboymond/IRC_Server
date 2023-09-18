@@ -113,6 +113,7 @@ void Server::waitToNewConnection() {
 			fcntl(tmp_user_socket, F_SETFL, O_NONBLOCK);
 			_userSocket.push_back(tmp_user_socket);
 			client.sendToClient(tmp_user_socket, "Enter the password with /PASS\r\n");
+			client.setServerPassword(_password);
 		}
 
 		for (size_t i = 0; i < _userSocket.size(); i++) {
@@ -138,18 +139,22 @@ void Server::waitToNewConnection() {
 						client.printOutput(1, fullMessage, 0, sd);
 
 						cout << "buffer passe par la = " << fullMessage << endl;
-						if (client.addUser(buffer, sd)) {
-							if (client.passwordVerifier(sd) == false) {
-								client.setServerPassword(_password);
-								client.setClientSocket(sd);
-								client.parsCommands(buffer);
-								client.pass();
-								if (strncmp(buffer, "QUIT ", 5) == 0) {
+//						if (client.addUser(buffer, sd)) {
+//							if (client.passwordVerifier(sd) == false) {
+								if (fullMessage.find("QUIT") != string::npos || fullMessage.find("quit") != string::npos ) {
 									client.quit();
 									close(sd);
 									_userSocket.erase(_userSocket.begin() + (int) i);
 								}
-							}
+								else
+								{
+									client.addUser(fullMessage, sd);
+									client.setClientSocket(sd);
+									client.parsCommands(fullMessage);
+									client.checkAndExecuteCmd();
+								}
+//								client.pass();
+//							}
 //							else {
 //								client.setClientSocket(sd);
 //								client.parsCommands(buffer);
@@ -160,7 +165,7 @@ void Server::waitToNewConnection() {
 //									_userSocket.erase(_userSocket.begin() + (int) i);
 //								}
 //							}
-						}
+//						}
 						clientBuffers[sd].erase(0, pos + 2);
 					}
 				}
