@@ -12,21 +12,13 @@ void Client::parsCommands(string buffer) {
 	std::getline(ss, argument);
 	size_t pos = argument.find('\r');
 
-	cout << "COMMAND avant = " << command << " | ARGUMENT avant = " << argument << endl;
-
 	if (pos != string::npos) {
 		argument.erase(pos);
 	}
 
-//	argument.erase(argument.length() - 1);
 	argument.erase(0, 1);
 
 	_cmd[command] = argument;
-
-
-	std::map<std::string, std::string>::iterator it = _cmd.find(command);
-	if (it != _cmd.end())
-		cout << "COMMAND = " << it->first << " | ARGUMENT = " << it->second << endl;
 }
 
 void   Client::checkAndExecuteCmd() {
@@ -37,10 +29,6 @@ void   Client::checkAndExecuteCmd() {
 		command = it->first;
 	for (size_t i = 0; i < command.length(); ++i)
 		command[i] = std::toupper(command[i]);
-
-	cout << "dans check command" << endl;
-
-
 
 	if (passwordVerifier(getClientSocket()) == true || command == "PASS") {
 		std::string	cmd[NBR_OF_CMD] = { "CAP LS", "USER", "NICK", "JOIN", "WHO", "KICK", "PRIVMSG", "PASS", "PART", "TOPIC", "INVITE", "MODE" };
@@ -56,9 +44,6 @@ void   Client::checkAndExecuteCmd() {
 		if (commandFound == false)
 			sendToClient(getClientSocket(), "Command not found: " + command + "\r\n");
 	}
-
-
-
 	_cmd.clear();
 }
 
@@ -67,65 +52,69 @@ void Client::join(){
 	std::map<std::string, std::string>::iterator it = _cmd.begin();
 	std::string channel = it->second;
 	std::string passWord;
+	size_t found = channel.find('#');
 
-	if (!channel.empty()) {
-		std::stringstream ss(channel);
-		ss >> channel >> passWord;
-		passWord.erase(passWord.length());
-		cout << "Password for channel = " << passWord <<endl;
-		if (getPasswordChannel(channel) == passWord)
-			_user[clientSocket].setUserHaveGoodPassForEnterInChannel(channel, true);
-		else if (getPasswordChannel(channel) != passWord && _channelBlockedByPassword[channel] == true) {
-			sendToClient(_user[clientSocket].getSocketUser(), "Bad password\r\n");
-			_user[clientSocket].setUserHaveGoodPassForEnterInChannel(channel, false);
+	if (found != string::npos)
+	{
+		if (!channel.empty()) {
+			std::stringstream ss(channel);
+			ss >> channel >> passWord;
+			passWord.erase(passWord.length());
+			if (getPasswordChannel(channel) == passWord)
+				_user[clientSocket].setUserHaveGoodPassForEnterInChannel(channel, true);
+			else if (getPasswordChannel(channel) != passWord && _channelBlockedByPassword[channel] == true) {
+				sendToClient(_user[clientSocket].getSocketUser(), "Bad password\r\n");
+				_user[clientSocket].setUserHaveGoodPassForEnterInChannel(channel, false);
+			}
 		}
-	}
 
+		if (_channelBlockedByPassword[channel] == false || (_channelBlockedByPassword[channel] == true && _user[clientSocket].getUserHaveGoodPassForEnterInChannel(channel) == true) ) {
+			if (_setFullAccessInChannel[channel] != true || _user[clientSocket].getAccessWithInvite(channel) == true) {
+				if (_user.find(clientSocket) != _user.end()) {
+					std::map<string, string>::iterator it;
+					it = _cmd.begin();
+					if (checkChannelExist(channel) != true) {
 
-	if (_channelBlockedByPassword[channel] == false || (_channelBlockedByPassword[channel] == true && _user[clientSocket].getUserHaveGoodPassForEnterInChannel(channel) == true) ) {
-		if (_setFullAccessInChannel[channel] != true || _user[clientSocket].getAccessWithInvite(channel) == true) {
-			if (_user.find(clientSocket) != _user.end()) {
-				std::map<string, string>::iterator it;
-				it = _cmd.begin();
-				if (checkChannelExist(channel) != true) {
-
-					_user[clientSocket].setChannelName(channel);
-					_user[clientSocket].setOperator(true);
-					_user[clientSocket].setIsOperator(channel, true);
-					setWhoIsOP(channel, _user[clientSocket].getNickName());
-					_user[clientSocket].setWho(false);
-					cout << _user[clientSocket].getNickName() << " is operator !" << endl;
-				} else {
-					_user[clientSocket].setChannelName(channel);
-					_user[clientSocket].setIsOperator(channel, false);
-					_user[clientSocket].setWho(false);
-				}
-				for (std::map<int, User>::iterator it = _user.begin(); it != _user.end(); ++it) {
-					User currentUser = it->second;
-					if (currentUser.searchChannel(channel) == true) {
-						std::string responseToJoin =
-								":" + _user[clientSocket].getNickName() + "!~" + _user[clientSocket].getUserName() +
-								"@localhost " + "JOIN " + ":" + channel + "\r\n";
-
-						sendToClient(currentUser.getSocketUser(), responseToJoin);
+						_user[clientSocket].setChannelName(channel);
+						_user[clientSocket].setOperator(true);
+						_user[clientSocket].setIsOperator(channel, true);
+						setWhoIsOP(channel, _user[clientSocket].getNickName());
+						_user[clientSocket].setWho(false);
+						cout << _user[clientSocket].getNickName() << " is operator !" << endl;
+					} else {
+						_user[clientSocket].setChannelName(channel);
+						_user[clientSocket].setIsOperator(channel, false);
+						_user[clientSocket].setWho(false);
 					}
+					for (std::map<int, User>::iterator it = _user.begin(); it != _user.end(); ++it) {
+						User currentUser = it->second;
+						if (currentUser.searchChannel(channel) == true) {
+							std::string responseToJoin =
+									":" + _user[clientSocket].getNickName() + "!~" + _user[clientSocket].getUserName() +
+									"@localhost " + "JOIN " + ":" + channel + "\r\n";
 
+							sendToClient(currentUser.getSocketUser(), responseToJoin);
+						}
+					}
 				}
 			}
-
+			else {
+				sendToClient(_user[clientSocket].getSocketUser(), ":localhost 473 " + _user[clientSocket].getNickName() + " " + channel +
+					":Cannot join channel (invite only)\r\n");
+			}
 		}
 		else {
-			sendToClient(_user[clientSocket].getSocketUser(), ":localhost 473 " + _user[clientSocket].getNickName() + " " + channel +
-				":Cannot join channel (invite only)\r\n");
+			std::string responseBadPassword =
+					":localhost 475 " + _user[clientSocket].getNickName() + " " + channel + " :Cannot join channel (incorrect channel key)\r\n";
+
+			sendToClient(_user[clientSocket].getSocketUser(), responseBadPassword);
 		}
 	}
-	else {
-		std::string responseBadPassword =
-				":localhost 475 " + _user[clientSocket].getNickName() + " " + channel + " :Cannot join channel (incorrect channel key)\r\n";
-
-		sendToClient(_user[clientSocket].getSocketUser(), responseBadPassword);
+	else
+	{
+		string responseIfChannelNameInvalid = ":*.localhost 476 " + _user[clientSocket].getNickName() + " " + channel + " :Invalid channel name\r\n";
+		sendToClient(_user[clientSocket].getSocketUser(), responseIfChannelNameInvalid);
 	}
-	_user[clientSocket].printAllChannel();
 	_cmd.clear();
 }
 
@@ -135,19 +124,28 @@ void Client::nick(){
 	std::string nickname = it->second;
 
 	if (nickname.length() < 15) {
-		if (_user.find(socketUser) != _user.end()){
+		if (_user.find(socketUser) != _user.end())
+		{
 			User checkUser = _user[socketUser];
 			checkUser.setNickName(nickname);
-			string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-			                  "@localhost " + "NICK :" + nickname + "\r\n";
-
-
+			std::vector<string> currentChannel = _user[socketUser].getChannelName();
+			for (size_t i = 0; i < currentChannel.size(); i++)
+			{
+				for (std::map<int, User>::iterator it = _user.begin();  it != _user.end() ; it++) {
+					if (it->second.searchChannel(currentChannel[i]))
+					{
+						string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() + "@localhost NICK :" + nickname + "\r\n";
+						sendToClient(it->second.getSocketUser(), response);
+					}
+				}
+			}
+			string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() + "@localhost " + "NICK :" + nickname + "\r\n";
 			sendToClient(socketUser, response);
 			_user[socketUser] = checkUser;
 		}
 	}
 	else {
-		sendToClient(socketUser, "Nickname to long, max 8 characters\r\n");
+		sendToClient(socketUser, "Nickname to long, max 15 characters\r\n");
 	}
 	_cmd.clear();
 }
@@ -165,8 +163,6 @@ void    Client::who() {
 
 		for (it = _user.begin(); it != _user.end(); it++) {
 			User &currentUser = it->second;
-			cout << "IN WHO NAME = " << currentUser.getNickName() << " | channel = " << channel << " | isOP = " << currentUser.getIsOperator(channel) << endl;
-
 			if (currentUser.searchChannel(channel)) {
 
 				if (currentUser.getIsOperator(channel) == true)
@@ -174,12 +170,10 @@ void    Client::who() {
 				else
 					op = "";
 
-				resp_who = ":*.localhost 354 " + _user[socketUser].getNickName() + " 152 " + channel +
-						   " " + currentUser.getNickName() + " :H" + op + "\r\n";
+				resp_who = ":*.localhost 354 " + _user[socketUser].getNickName() + " 152 " + channel + " " + currentUser.getNickName() + " :H" + op + "\r\n";
 				sendToClient(socketUser, resp_who);
 				resp_who.erase();
 			}
-
 		}
 		resp_who =  ":*.localhost 315 " + _user[socketUser].getNickName() + " " + channel + " :End of /WHO list.\r\n";
 		sendToClient(socketUser, resp_who);
@@ -223,9 +217,7 @@ void    Client::who() {
 				continue;
 
 		}
-		resp_who = ":*.localhost 315 " + _user[socketUser].getNickName() +
-				   " " + channel + " :End of /WHO list.\r\n";
-
+		resp_who = ":*.localhost 315 " + _user[socketUser].getNickName() + " " + channel + " :End of /WHO list.\r\n";
 		sendToClient(socketUser, resp_who);
 		resp_who.erase();
 		op.erase();
@@ -324,26 +316,21 @@ void    Client::topic(){
 		string nameOfChannelTopic = argument.substr(argument.find(':'), argument.length());
 
 		string responseIfchannelNotExiste = ":*.@localhost 403 " + nick + " " + nameOfChannelTopic + " :No such channel\r\n";
-		string responseIfChannelCanHaveTop = ":" + nick + "!~" + user + "@localhost" + " TOPIC " + argument + "\r\n";
 		string responseIfUserHaveNoPermission = ":*.localhost 482 " + nick + " " + channel + " :You do not have access to change the topic on this channel\r\n";
 		if (checkChannelExist(channel) == true)
 		{
 			if (_user[socketUser].getIsOperator(channel) == true || _setFullAccessForTopic[channel] == true)
 			{
 				for (map<int, User>::iterator it = _user.begin(); it != _user.end() ; ++it) {
-//                    cout << "username = " << it->second.getUserName() << endl;
 					User currentUser = it->second;
 					if (currentUser.searchChannel(channel) == true) {
 						string user = _user[socketUser].getUserName();
 						string nick = _user[socketUser].getNickName();
 						string response2 = ":" + nick + "!~" + user + "@localhost TOPIC " + argument + "\r\n";
 						sendToClient(currentUser.getSocketUser(), response2);
-//						_user[socketUser].setChannelandTopic(true, channel, nameOfChannelTopic);
 						_user[socketUser].setChannelandTopic(channel, nameOfChannelTopic);
-//						_user[socketUser].printChannelTopic();
 					}
 				}
-//                sendToClient(socketUser, responseIfChannelCanHaveTop);
 			}
 			else
 			{
@@ -361,17 +348,12 @@ void    Client::privmsg(){
 	int socketUser = getClientSocket();
 	std::map<std::string, std::string>::iterator it_chan = _cmd.begin();
 	std::string msg = it_chan->second;
-	cout << "MSG = " << msg << endl;
 
 	for (std::map<int, User>::iterator it = _user.begin(); it != _user.end(); ++it) {
 
 		User currentUser = it->second;
 		if (currentUser.getSocketUser() != socketUser) {
-			std::string response =
-					":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-					"@localhost " + "PRIVMSG " + msg + "\r\n";
-
-
+			std::string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() + "@localhost " + "PRIVMSG " + msg + "\r\n";
 			sendToClient(currentUser.getSocketUser(), response);
 		}
 	}
@@ -380,16 +362,20 @@ void    Client::privmsg(){
 
 void Client::pass(){
 
+	int socketUser = getClientSocket();
 	std::map<std::string, std::string>::iterator it = _cmd.begin();
 	std::string command = it->first;
 	std::string password = it->second;
 
 	for (size_t i = 0; i < command.length(); ++i)
 		command[i] = std::toupper(command[i]);
-
-	cout << "in pass command = " << command << " | password = " << password << " | getPass = " << getServerPassword() << endl;
 	if (password == getServerPassword()) {
-		sendToClient(getClientSocket(), "WELCOME TO THE SERVER\r\n");
+		if (_user[socketUser].getItsOKToAddNick() && _user[socketUser].getHasSetNick() == false) {
+			_user[socketUser].initUserAndNick();
+			_user[socketUser].setHasSetNick(true);
+		}
+		string response = ":*.localhost 001 " + _user[socketUser].getNickName() + " :Welcome to the FT_IRC Network " + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() + "@localhost\r\n";
+		sendToClient(socketUser, response);
 		_user[getClientSocket()].setPasswordIsValid(true);
 	}
 	else {
@@ -406,11 +392,7 @@ void Client::quit() {
 
 		User currentUser = it->second;
 		if (currentUser.getSocketUser() != socketUser) {
-			std::string response =
-					":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-					"@localhost " + "QUIT :Quit: Leaving\r\n";
-
-
+			std::string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() + "@localhost " + "QUIT :Quit: Leaving\r\n";
 			sendToClient(currentUser.getSocketUser(), response);
 		}
 	}
@@ -463,11 +445,9 @@ void Client::mode() {
 	if (_user[socketUser].getIsOperator(channel) == true){
 		if (option == "-o" || option == "+o") {
 			option_o(channel, option, arg2);
-			cout << "In mode o = " << channel << " | option = " << option << " | nickname = " << arg2 << endl;
 		}
 		else if (option == "-k" || option == "+k") {
 			option_k(channel, option, arg2);
-			cout << "In mode k = " << channel << " | option = " << option << " | nickname = " << arg2 << endl;
 		}
 		else if (option == "-t" || option == "+t") {
 			option_t(channel, option);
@@ -497,21 +477,14 @@ void Client::option_o(std::string channel, std::string option, std::string nickN
 			User &currentUser = it->second;
 			if (currentUser.searchChannel(channel) == true) {
 				if (currentUser.getNickName() == nickName && arg_resp == "+o") {
-					cout << "IN +o" << endl;
 					currentUser.setWho(false);
 					currentUser.setIsOperator(channel, true);
-					cout << "IN MODE +O NAME = " << currentUser.getNickName() << " | channel = " << channel << " | isOP = " << currentUser.getIsOperator(channel) << endl;
-
 				}
 				else if (currentUser.getNickName() == nickName && arg_resp == "-o") {
-					cout << "IN -o" << endl;
 					currentUser.setWho(false);
 					currentUser.setIsOperator(channel, false);
-					cout << "IN MODE -O NAME = " << currentUser.getNickName() << " | channel = " << channel << " | isOP = " << currentUser.getIsOperator(channel) << endl;
-
 				}
-				sendToClient(currentUser.getSocketUser(), ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-														  "@localhost " + "MODE " + channel + " " + arg_resp + " :" + nickName +"\r\n" );
+				sendToClient(currentUser.getSocketUser(), ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() + "@localhost " + "MODE " + channel + " " + arg_resp + " :" + nickName +"\r\n" );
 			}
 
 		}
@@ -533,8 +506,7 @@ void Client::option_k(std::string channel, std::string option, std::string passW
 	else if (arg_resp == "-k" && getPasswordChannel(channel) == passWord) {
 		erasePasswordChannel(channel);
 	}
-	sendToClient(_user[socketUser].getSocketUser(), ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-			  "@localhost " + "MODE " + channel + " " + arg_resp + " :" + passWord +"\r\n" );
+	sendToClient(_user[socketUser].getSocketUser(), ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() + "@localhost " + "MODE " + channel + " " + arg_resp + " :" + passWord +"\r\n" );
 }
 
 void Client::option_t(std::string channel, std::string option) {
@@ -589,18 +561,13 @@ void Client::user() {
 		if (_user.find(socketUser) != _user.end()){
 			User checkUser = _user[socketUser];
 			checkUser.setNickName(username);
-			string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() +
-			                  "@localhost " + "USER :" + username + "\r\n";
-
-
+			string response = ":" + _user[socketUser].getNickName() + "!~" + _user[socketUser].getUserName() + "@localhost " + "USER :" + username + "\r\n";
 			sendToClient(socketUser, response);
 			_user[socketUser] = checkUser;
 		}
 	}
 	else {
-		sendToClient(socketUser, "Username to long, max 8 characters\r\n");
+		sendToClient(socketUser, "Username to long, max 15 characters\r\n");
 	}
 	_cmd.clear();
 }
-
-

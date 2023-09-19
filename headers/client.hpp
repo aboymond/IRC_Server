@@ -18,16 +18,16 @@ class Server;
 class Client {
 
 private:
-	Server  *_server;
-	string  _command;
-	string  _options;
-	string  _currentOP;
-	string 	_serverPassword;
-	map<std::string, bool> 	_setFullAccessForTopic;
-	map<std::string, bool> 	_setFullAccessInChannel;
-	int     _clientSocket;
-	map <int, User>         _user;
-	map <string, string>    _cmd;
+	Server  							*_server;
+	string  							_command;
+	string  							_options;
+	string  							_currentOP;
+	string 								_serverPassword;
+	map<std::string, bool> 				_setFullAccessForTopic;
+	map<std::string, bool> 				_setFullAccessInChannel;
+	int     							_clientSocket;
+	map <int, User>         			_user;
+	map <string, string>    			_cmd;
 	std::map <std::string, std::string>	_whoIsOP;
 	std::map<std::string, std::string>	_passwordChannel;
 	std::map<std::string, bool>			_channelBlockedByPassword;
@@ -63,44 +63,44 @@ public:
 	void	mode();
 
 	//OPTIONS MODE
-	void	option_o(std::string channel, std::string arg, std::string nickName);
-	void	option_k(std::string channel, std::string arg, std::string passWord);
-	void	option_i(std::string channel, std::string option);
-	void	option_t(std::string channel, std::string option);
+	void				option_o(std::string channel, std::string arg, std::string nickName);
+	void				option_k(std::string channel, std::string arg, std::string passWord);
+	void				option_i(std::string channel, std::string option);
+	void				option_t(std::string channel, std::string option);
 
 
 	//CHANNEL
-	string	extractChannelName(string buffer);
-	bool	checkChannelExist(std::string channelname);
+	string				extractChannelName(string buffer);
+	bool				checkChannelExist(std::string channelname);
 
 	//GET
-	string		getCommand() const;
-	string		getOptions() const;
-	bool		getStatusPasswordClient(int socketUser);
-	int			getClientSocket() const;
-	bool		getChannelBlockedByPassword(std::string channel);
-	std::string		getWhoIsOP_Nick(std::string channel);
-	const User&		getUser(int usersocket) const;
-	std::string		getServerPassword() const;
-	vector<User>	getUserVector() const;
+	string				getCommand() const;
+	string				getOptions() const;
+	bool				getStatusPasswordClient(int socketUser);
+	int					getClientSocket() const;
+	bool				getChannelBlockedByPassword(std::string channel);
+	std::string			getWhoIsOP_Nick(std::string channel);
+	const User&			getUser(int usersocket) const;
+	std::string			getServerPassword() const;
+	vector<User>		getUserVector() const;
 	const std::string	&getPasswordChannel(std::string channel);
 
 	//SET
-	void	setClientSocket(int clientSocket);
-	void	setServerPassword(std::string password);
-	void	setPasswordChannel(const std::string &channel, std::string passWordChannel);
+	void				setClientSocket(int clientSocket);
+	void				setServerPassword(std::string password);
+	void				setPasswordChannel(const std::string &channel, std::string passWordChannel);
 
 
 	//TOOLS
-	void	sendToClient(int fd, std::string message);
-	void	setWhoIsOP(std::string channel, std::string nickname);
-	void	printOutput(int numofoption, string message, int options, int fd);
-	bool	UserIsOnChannel(std::string user, std::string channel);
-	int		getSocketUserWithName(string user);
-	bool	passwordVerifier(int socketUser);
-	void	erasePasswordChannel(std::string channel);
-	void 	eraseChannelUser(string channel, string user);
-	void	addBufferToTmpVector(std::string tmpBuffer);
+	void				sendToClient(int fd, std::string message);
+	void				setWhoIsOP(std::string channel, std::string nickname);
+	void				printOutput(int numofoption, string message, int options, int fd);
+	bool				UserIsOnChannel(std::string user, std::string channel);
+	int					getSocketUserWithName(string user);
+	bool				passwordVerifier(int socketUser);
+	void				erasePasswordChannel(std::string channel);
+	void 				eraseChannelUser(string channel, string user);
+	void				addBufferToTmpVector(std::string tmpBuffer);
 
 
 

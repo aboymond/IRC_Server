@@ -77,7 +77,7 @@ void 		Client::setPasswordChannel(const std::string &channel, std::string passWo
 }
 
 int Client::addUser(string buffer, int socketUser) {
-	(void)buffer;
+	(void) buffer;
 	if (_user[socketUser].getUserCreate() == false) {
 		if (_user[socketUser].getNickName().empty()) {
 			stringstream ss;
@@ -89,26 +89,10 @@ int Client::addUser(string buffer, int socketUser) {
 			_user[socketUser].setUserCreate(true);
 
 		}
-		cout << "IN ADD USER" << endl;
 		return (0);
 	}
-	if (passwordVerifier(socketUser) == true && _user[socketUser].getItsOKToAddNick() && _user[socketUser].getHasSetNick() == false) {
-		_user[socketUser].initUserAndNick();
-		_user[socketUser].setHasSetNick(true);
-	}
+
 	return (0);
-//	if (_user.find(socketUser) != _user.end() && _user[socketUser].getUserCreate() == true) {
-//		//printOutput(1, buffer, 0, socketUser);
-//		return (-1);
-//	}
-//	User newUser;
-//
-//	if (newUser.initUserAndNick(buffer) == true)
-//		_user[socketUser].setUserCreate(true);
-//	newUser.setSocketUser(socketUser);
-//	_user[socketUser] = newUser;
-//	//printOutput(1, buffer, 0, socketUser);
-//	return (0);
 }
 
 void Client::eraseUser(int socketUser){
@@ -120,6 +104,7 @@ void Client::eraseUser(int socketUser){
 bool Client::userCanExecuteCommand(string password, int userSocket, string buffer) {
 	int deletechar = buffer.length();
 	buffer = buffer.substr(0, deletechar - 2);
+
 	if (password == buffer)
 	{
 		_user[userSocket].setPasswordIsValid(true);
@@ -131,6 +116,7 @@ bool Client::userCanExecuteCommand(string password, int userSocket, string buffe
 
 bool Client::checkChannelExist(std::string channelName) {
 	std::map<int, User>::iterator it;
+
 	for (it = _user.begin(); it != _user.end(); ++it) {
 		const User& currentUser = it->second;
 		if (currentUser.searchChannel(channelName)) {
@@ -148,7 +134,7 @@ string Client::extractChannelName(string buffer) {
 
 	size_t found = buffer.find('#');
 	string channel;
-//    found += 1;
+
 	if (found != std::string::npos)
 	{
 		string channel = buffer.substr(found, buffer.find(' ', found) - found);
@@ -172,11 +158,9 @@ bool Client::UserIsOnChannel(std::string user, std::string channel) {
 			vector <string> channelUser = it->second.getChannelName();
 			for (size_t i = 0; i < channelUser.size(); ++i) {
 				if (channelUser[i] == channel) {
-					cout << "user is on channel" << endl;
 					return (true);
 				}
 			}
-			cout << "user is not in this channel" << endl;
 			return (false);
 		}
 	}

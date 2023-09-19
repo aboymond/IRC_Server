@@ -9,9 +9,7 @@ User::User() :
 	_who(false),
 	_PasswordIsValid(false),
 	_hasSetNick(false)
-{
-	cout << "constructor user called" << endl;
-};
+{};
 
 User::~User() {};
 
@@ -137,9 +135,7 @@ bool 			User::getAccessWithInvite(std::string channel) {
 
 bool User::searchChannel(std::string channelName) const {
 	for (std::vector<std::string>::const_iterator it = _channelName.begin(); it != _channelName.end(); ++it){
-		cout << "it = " << *it << endl;
 		if (it->compare(channelName) == 0){
-			cout << "true" << endl;
 			return true;
 		}
 	}
@@ -163,14 +159,12 @@ bool    User::initUserAndNick(){
 			stringstream ss1(_tmpBuffer[i]);
 			string cmd;
 			ss1 >> cmd >> nickName;
-			cout << "NICK IN INIT : " << nickName << endl;
             setNickName(nickName);
         }
         if (_tmpBuffer[i].find("USER ") == 0) {
 			stringstream ss2(_tmpBuffer[i]);
 			string cmd2;
 			ss2 >> cmd2 >> userName;
-			cout << "USER IN INIT : " << userName << endl;
             setUserName(userName);
         }
     }
@@ -187,7 +181,6 @@ void User::printAllChannel() {
 
 void 		User::delChannelName(std::string channel) {
 	for (vector<std::string>::iterator it = _channelName.begin(); it != _channelName.end(); it++) {
-		cout << "it = " << *it << endl;
 		if (*it == channel)
 		{
 			_channelName.erase(it);

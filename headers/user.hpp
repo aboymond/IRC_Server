@@ -15,25 +15,21 @@
 class User {
 
 protected:
-	//Client		*_client;
-
-	std::string						_nickName;
-	std::string						_userName;
-	int								_socket_user;
-	bool							_moderator;
-	bool							_userCreate;
-	std::vector<std::string>		_channelName;
-	std::map<std::string, bool>     _isOperator;
-	std::map<std::string, bool>		_userHaveGoodPassForEnterInChannel;
-	std::map<std::string, bool>		_accessWithInvite;
-
-	bool 							_who;
-
-	bool							_PasswordIsValid;
-	std::map<std::string, std::string> _channelTopic;
-	std::vector<std::string>			_tmpBuffer;
-	bool 								_itsOKToAddNick;
-	bool 								_hasSetNick;
+	std::string								_nickName;
+	std::string								_userName;
+	int										_socket_user;
+	bool									_moderator;
+	bool									_userCreate;
+	std::vector<std::string>				_channelName;
+	std::map<std::string, bool>     		_isOperator;
+	std::map<std::string, bool>				_userHaveGoodPassForEnterInChannel;
+	std::map<std::string, bool>				_accessWithInvite;
+	bool 									_who;
+	bool									_PasswordIsValid;
+	std::map<std::string, std::string> 		_channelTopic;
+	std::vector<std::string>				_tmpBuffer;
+	bool 									_itsOKToAddNick;
+	bool 									_hasSetNick;
 
 
 public:
@@ -87,13 +83,6 @@ public:
 	void 				printAllChannel();
 	void 				printChannelTopic();
 	bool                userIsOnChannelWithTopic(std::string channel);
-
-
-
-
-
-
-
 };
 
 std::ostream &operator<<(std::ostream &o, User const &i);

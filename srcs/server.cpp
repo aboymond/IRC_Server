@@ -5,7 +5,6 @@ Server::Server() :
 	_port(0),
 	_password("Default"),
 	_validPassword(false) {
-
 };
 
 Server::Server(int port, string password) : _port(port), _validPassword(false) {
@@ -60,12 +59,6 @@ const vector<int>& Server::getUserSockets() const {
 	return _userSocket;
 }
 
-
-
-//const Client* Server::getClient() const {
-//	return _client;
-//}
-
 void Server::createSocketServer() {
 
 
@@ -76,7 +69,6 @@ void Server::createSocketServer() {
 	bind(_socketServer, (struct sockaddr *) &_serverAddress, sizeof(_serverAddress));
 	listen(_socketServer, 5);
 	serverPrintOutput(_port, _socketServer);
-
 }
 
 void Server::waitToNewConnection() {
@@ -109,13 +101,11 @@ void Server::waitToNewConnection() {
 			if ((tmp_user_socket = accept(_socketServer, (struct sockaddr *) &_serverAddress, &addrlen)) < 0) {
 				cout << "Error with accept" << endl;
 			}
-
 			fcntl(tmp_user_socket, F_SETFL, O_NONBLOCK);
 			_userSocket.push_back(tmp_user_socket);
 			client.sendToClient(tmp_user_socket, "Enter the password with /PASS\r\n");
 			client.setServerPassword(_password);
 		}
-
 		for (size_t i = 0; i < _userSocket.size(); i++) {
 			int sd = _userSocket[i];
 			char buffer[1024];
@@ -123,12 +113,10 @@ void Server::waitToNewConnection() {
 			if (FD_ISSET(sd, &readfds)) {
 				size_t val_read;
 				if ((val_read = recv(sd, buffer, 1024, 0)) == 0) {
-					cout << "rentre dans le if" <<endl;
 					client.eraseUser(sd);
 					close(sd);
 					_userSocket.erase(_userSocket.begin() + (int)i);
 				} else {
-					cout << "rentre dans le else" <<endl;
 					buffer[val_read] = '\0';
 
 					client.printOutput(1, buffer, 0, sd);
@@ -137,43 +125,23 @@ void Server::waitToNewConnection() {
 					while ((pos = clientBuffers[sd].find("\r\n")) != std::string::npos || (pos = clientBuffers[sd].find("\n")) != std::string::npos) {
 						std::string fullMessage = clientBuffers[sd].substr(0, pos);
 						client.printOutput(1, fullMessage, 0, sd);
-
-						cout << "buffer passe par la = " << fullMessage << endl;
-//						if (client.addUser(buffer, sd)) {
-//							if (client.passwordVerifier(sd) == false) {
-								if (fullMessage.find("QUIT") != string::npos || fullMessage.find("quit") != string::npos ) {
-									client.quit();
-									close(sd);
-									_userSocket.erase(_userSocket.begin() + (int) i);
-								}
-								else
-								{
-									client.addUser(fullMessage, sd);
-									client.setClientSocket(sd);
-									client.parsCommands(fullMessage);
-									client.checkAndExecuteCmd();
-								}
-//								client.pass();
-//							}
-//							else {
-//								client.setClientSocket(sd);
-//								client.parsCommands(buffer);
-//								client.checkAndExecuteCmd();
-//								if (strncmp(buffer, "QUIT ", 5) == 0) {
-//									client.quit();
-//									close(sd);
-//									_userSocket.erase(_userSocket.begin() + (int) i);
-//								}
-//							}
-//						}
+						if (fullMessage.find("QUIT") != string::npos || fullMessage.find("quit") != string::npos ) {
+							client.quit();
+							close(sd);
+							_userSocket.erase(_userSocket.begin() + (int) i);
+						}
+						else
+						{
+							client.addUser(fullMessage, sd);
+							client.setClientSocket(sd);
+							client.parsCommands(fullMessage);
+							client.checkAndExecuteCmd();
+						}
 						clientBuffers[sd].erase(0, pos + 2);
 					}
 				}
 			}
-
 		}
-
-
 	}
 	close(_socketServer);
 }
@@ -189,7 +157,7 @@ const char *Server::FailOpeningSocket::what() const throw() {
 std::ostream &operator<<(std::ostream &o, Server const &i) {
 	o <<
 	  "Socket server Number: " << i.getSocketServer() << "\n"
-	                                                     "Connect to port: " << i.getPort() << "\n"
+														 "Connect to port: " << i.getPort() << "\n"
 	                                                                                           "Password: "
 	  << i.getPassword() << "\n"
 	                        "Password status: " << i.getValidPassword() << "\n";

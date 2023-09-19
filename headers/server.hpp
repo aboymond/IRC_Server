@@ -26,16 +26,7 @@
 
 using namespace std;
 
-//#define IP_SERV "127.0.0.1"
-
-
-//#define IP_SERV "10.13.3.5"
-
 #define IP_SERV "127.0.0.1"
-
-
-//#define IP_SERV "10.11.12.1" // IP 42 Alex
-//#define IP_SERV "10.11.12.3" // IP 42 Quent
 
 class User;
 class Client;
@@ -43,12 +34,12 @@ class Client;
 class Server {
 
 private:
-	int _socketServer;
-	int _port;
-	string _password;
-	bool _validPassword;
-	vector<int> _userSocket;
-	struct sockaddr_in _serverAddress;
+	int 				_socketServer;
+	int 				_port;
+	string 				_password;
+	bool 				_validPassword;
+	vector<int> 		_userSocket;
+	struct sockaddr_in 	_serverAddress;
 	Client				*_client;
 
 
@@ -59,15 +50,16 @@ public:
 	Server(int port, string password);
 	Server &operator=(Server const &rhs);
 	~Server();
+
 //SET
-	void setPassword(std::string password);
+	void 		setPassword(std::string password);
 
 // GET
-	int getPort() const;
-	int getSocketServer() const;
-	string getPassword() const;
-	bool getValidPassword() const;
-	const vector<int>& getUserSockets() const;
+	int 				getPort() const;
+	int 				getSocketServer() const;
+	string 				getPassword() const;
+	bool 				getValidPassword() const;
+	const vector<int>& 	getUserSockets() const;
 
 //SERV
 	void createSocketServer();
